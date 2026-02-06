@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Adicionar projeto — Portfólio{% endblock %}
+
+{% block content %}
+<section>
+    <h1 class="section-title">Adicionar projeto</h1>
+
+    <form class="form-card" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="field">
+            <label for="capa">Capa (imagem)</label>
+            <input type="file" name="capa" id="capa" accept=".png,.jpg,.jpeg,.gif" required>
+        </div>
+        <div class="field" id="capa-preview" style="display: none;">
+            <label>Preview da capa</label>
+            <img id="capa-preview-img" alt="Preview da capa selecionada">
+        </div>
+        <div class="field">
+            <label for="titulo">Título</label>
+            <input type="text" name="titulo" id="titulo" placeholder="Título do projeto" required>
+        </div>
+        <div class="field">
+            <label for="descricao">Descrição</label>
+            <textarea name="descricao" id="descricao" placeholder="Descrição do projeto" required></textarea>
+        </div>
+        <div class="field">
+            <label for="url">URL (opcional)</label>
+            <input type="text" name="url" id="url" placeholder="https://exemplo.com">
+        </div>
+        <div class="form-actions">
+            <button class="button" type="submit">Adicionar projeto</button>
+            <a class="ghost-button" href="{% url 'index' %}">Voltar</a>
+        </div>
+    </form>
+</section>
+<script>
+    const capaInput = document.getElementById("capa");
+    const previewWrapper = document.getElementById("capa-preview");
+    const previewImg = document.getElementById("capa-preview-img");
+
+    capaInput.addEventListener("change", (event) => {
+        const [file] = event.target.files || [];
+        if (!file) {
+            previewWrapper.style.display = "none";
+            previewImg.removeAttribute("src");
+            return;
+        }
+        previewImg.src = URL.createObjectURL(file);
+        previewWrapper.style.display = "block";
+    });
+</script>
+{% endblock %}

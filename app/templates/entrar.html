@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Entrar — Portfólio{% endblock %}
+
+{% block content %}
+<section>
+    <h1 class="section-title">Entrar</h1>
+    {% if form.errors %}
+    <div class="empty-state">
+        Por favor, corrija os erros abaixo.
+    </div>
+    {% endif %}
+
+    <form class="form-card" method="post">
+        {% csrf_token %}
+        <div class="field">
+            <label for="username">Usuário</label>
+            <input type="text" name="username" id="username" value="{{ request.POST.username }}" required>
+        </div>
+        <div class="field">
+            <label for="password">Senha</label>
+            <input type="password" name="password" id="password" required>
+        </div>
+        <input type="hidden" name="next" value="{{ next }}">
+        <div class="form-actions">
+            <button class="button" type="submit">Entrar</button>
+        </div>
+    </form>
+</section>
+{% endblock %}

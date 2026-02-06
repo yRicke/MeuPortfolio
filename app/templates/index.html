@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Projetos — Portfólio{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-card">
+        <h1>Desenvolvedor Full-Stack</h1>
+        <p>
+            <strong>Técnico em Desenvolvimento de Sistemas</strong>, construo 
+            <strong>aplicações web rápidas, seguras e bem estruturadas</strong>, 
+            do backend ao deploy. Transformo ideias em sistemas reais, prontos para uso.
+        </p>
+        <div class="hero-actions">
+            <a class="button" href="{% url 'sobre' %}">Sobre mim</a>
+            <a class="ghost-button" href="#projetos" data-scroll>Ver projetos</a>
+        </div>
+    </div>
+
+    <div class="hero-card">
+        <p class="chip">Disponível para projetos</p>
+        <h2 class="section-title">Código limpo. Arquitetura simples. Resultado sólido.</h2>
+        <p>
+            Experiência com <strong>Django, Java, APIs, bancos de dados e automação</strong>, 
+            além de robótica competitiva (FTC). Foco em performance, organização e entrega confiável.
+        </p>
+        <div class="helper-links">
+            <a class="ghost-button" href="mailto:henriquevieiraperes@gmail.com">Falar por e-mail</a>
+        </div>
+    </div>
+</section>
+
+<section id="projetos">
+    <h2 class="section-title">Meus projetos</h2>
+    {% if projetos %}
+    <ul class="projetos-grid">
+        {% for projeto in projetos %}
+        <li class="projeto-card">
+            {% if projeto.capa %}
+            <img src="{{ projeto.capa.url }}" alt="Capa de {{ projeto.titulo }}">
+            {% endif %}
+            <div class="projeto-body">
+                <h2>{{ projeto.titulo }}</h2>
+                <p>{{ projeto.descricao|truncatechars:200 }}</p>
+                <div class="card-actions">
+                    {% if projeto.url %}
+                    <a class="button" href="{{ projeto.url }}" target="_blank" rel="noopener">Visitar projeto</a>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                    <a class="ghost-button" href="{% url 'editar_projeto' projeto.id %}">Editar</a>
+                    {% endif %}
+                </div>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state">
+        Ainda não há projetos cadastrados.
+    </div>
+    {% endif %}
+</section>
+<script>
+    const scrollLink = document.querySelector("[data-scroll]");
+    if (scrollLink) {
+        scrollLink.addEventListener("click", (event) => {
+            const target = document.querySelector(scrollLink.getAttribute("href"));
+            if (!target) {
+                return;
+            }
+            event.preventDefault();
+            const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+            const targetTop = target.getBoundingClientRect().top + window.scrollY;
+
+            if (prefersReducedMotion) {
+                window.scrollTo(0, targetTop);
+                return;
+            }
+
+            const startTop = window.scrollY;
+            const distance = targetTop - startTop;
+            const duration = 600;
+            let startTime = null;
+
+            const easeInOut = (t) => (t < 0.5
+                ? 2 * t * t
+                : 1 - Math.pow(-2 * t + 2, 2) / 2);
+
+            const step = (timestamp) => {
+                if (!startTime) startTime = timestamp;
+                const progress = Math.min((timestamp - startTime) / duration, 1);
+                const eased = easeInOut(progress);
+                window.scrollTo(0, startTop + distance * eased);
+                if (progress < 1) {
+                    requestAnimationFrame(step);
+                }
+            };
+
+            requestAnimationFrame(step);
+        });
+    }
+</script>
+{% endblock %}

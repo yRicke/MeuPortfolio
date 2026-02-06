@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Editar projeto — Portfólio{% endblock %}
+
+{% block content %}
+<section>
+    <h1 class="section-title">Editar projeto</h1>
+    {% if projeto %}
+        <div class="form-card">
+            {% if projeto.capa %}
+            <div class="field" id="capa-atual">
+                <p class="chip" id="capa-status">Capa atual</p>
+                <img id="capa-atual-img" src="{{ projeto.capa.url }}" alt="Capa {{ projeto.titulo }}">
+            </div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="field">
+                    <label for="capa">Trocar capa (opcional)</label>
+                    <input type="file" name="capa" id="capa" accept=".png,.jpg,.jpeg,.gif">
+                </div>
+                <div class="field">
+                    <label for="titulo">Título</label>
+                    <input type="text" name="titulo" id="titulo" value="{{ projeto.titulo }}" required>
+                </div>
+                <div class="field">
+                    <label for="descricao">Descrição</label>
+                    <textarea name="descricao" id="descricao" required>{{ projeto.descricao }}</textarea>
+                </div>
+                <div class="field">
+                    <label for="url">URL (opcional)</label>
+                    <input type="text" name="url" id="url" value="{{ projeto.url }}">
+                </div>
+                <div class="form-actions">
+                    <button class="button" type="submit">Salvar alterações</button>
+                    <a class="ghost-button" href="{% url 'deletar_projeto' projeto.id %}">Excluir projeto</a>
+                    <a class="ghost-button" href="{% url 'index' %}">Voltar</a>
+                </div>
+            </form>
+        </div>
+    {% else %}
+        <div class="empty-state">Projeto não encontrado.</div>
+    {% endif %}
+</section>
+<script>
+    const capaInput = document.getElementById("capa");
+            const capaAtual = document.getElementById("capa-atual");
+            const capaAtualImg = document.getElementById("capa-atual-img");
+            const capaStatus = document.getElementById("capa-status");
+
+            if (capaInput && capaAtual && capaAtualImg && capaStatus) {
+                capaInput.addEventListener("change", (event) => {
+                    const [file] = event.target.files || [];
+                    if (!file) {
+                        capaAtualImg.src = "{{ projeto.capa.url }}";
+                        capaStatus.textContent = "Capa atual";
+                        return;
+                    }
+                    capaAtualImg.src = URL.createObjectURL(file);
+                    capaStatus.textContent = "Nova capa (preview)";
+                });
+            }
+</script>
+{% endblock %}

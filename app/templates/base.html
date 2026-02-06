@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <title>{% block title %}Portfólio{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <script>
+        // Detectar e aplicar tema antes de renderizar a página
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            
+            if (theme === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+    </script>
+</head>
+<body>
+    <div class="particles-container" id="particlesContainer"></div>
+    <div class="page">
+        {% include "partials/nav.html" %}
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <main>
+            <div class="container">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
+
+        {% include "partials/footer.html" %}
+    </div>
+    
+    <script>
+        function createParticles() {
+            const container = document.getElementById('particlesContainer');
+            const particleCount = Math.min(30, Math.floor(window.innerWidth / 50));
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                const size = Math.random() * 9 + 2;
+                const duration = Math.random() * 25 + 20;
+                const delay = Math.random() * 5;
+                const xTranslate = (Math.random() - 0.5) * 200;
+                const startX = Math.random() * window.innerWidth;
+                const colors = ['rgba(127, 68, 204, 0.6)', 'rgba(137, 105, 245, 0.6)', 'rgba(170, 140, 255, 0.5)'];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                particle.style.left = startX + 'px';
+                particle.style.bottom = '-10px';
+                particle.style.backgroundColor = color;
+                particle.style.animation = `float ${duration}s linear ${delay}s infinite`;
+                particle.style.setProperty('--tx', xTranslate + 'px');
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        createParticles();
+        window.addEventListener('resize', () => {
+            const container = document.getElementById('particlesContainer');
+            container.innerHTML = '';
+            createParticles();
+        });
+    </script>
+    <script>
+        // Gerenciar alternância de tema
+        document.addEventListener('DOMContentLoaded', function() {
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            themeToggle.addEventListener('click', function() {
+                const html = document.documentElement;
+                const currentTheme = html.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                html.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+        });
+    </script>
+</body>
+</html>
