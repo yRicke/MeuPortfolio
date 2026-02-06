@@ -14,8 +14,8 @@
 
 /* Tema Escuro */
 [data-theme="dark"] {
-  --bg: #0f0a1a;
-  --bg-2: #1a1428;
+  --bg: #160f26;
+  --bg-2: #14101c;
   --surface: #25203d30;
   --ink: #e8dff5;
   --muted: #a8a0be;
@@ -205,7 +205,7 @@ img {
 .nav-links a:hover,
 .nav-links a:focus-visible {
   background: var(--accent);
-  color: var(--primary-strong);
+  color: var(--muted);
 }
 
 .nav-links .button {

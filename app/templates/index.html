@@ -41,7 +41,7 @@
             {% endif %}
             <div class="projeto-body">
                 <h2>{{ projeto.titulo }}</h2>
-                <p>{{ projeto.descricao|truncatechars:200 }}</p>
+                <p>{{ projeto.descricao|truncatechars:800 }}</p>
                 <div class="card-actions">
                     {% if projeto.url %}
                     <a class="button" href="{{ projeto.url }}" target="_blank" rel="noopener">Visitar projeto</a>
