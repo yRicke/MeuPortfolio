@@ -1,103 +1,182 @@
 {% extends "base.html" %}
 
-{% block title %}Projetos — Portfólio{% endblock %}
+{% block title %}Henrique Vieira — Desenvolvedor Full-Stack{% endblock %}
+{% block body_class %}portfolio-page{% endblock %}
 
 {% block content %}
-<section class="hero">
-    <div class="hero-card">
-        <h1>Desenvolvedor Full-Stack</h1>
-        <p>
-            <strong>Técnico em Desenvolvimento de Sistemas</strong>, construo 
-            <strong>aplicações web rápidas, seguras e bem estruturadas</strong>, 
-            do backend ao deploy. Transformo ideias em sistemas reais, prontos para uso.
-        </p>
-        <div class="hero-actions">
-            <a class="button" href="{% url 'sobre' %}">Sobre mim</a>
-            <a class="ghost-button" href="#projetos" data-scroll>Ver projetos</a>
-        </div>
-    </div>
+<div data-portfolio-page>
+    <section class="portfolio-section cover-section" id="inicio" data-section="inicio">
+        <div class="cover-grid" aria-hidden="true"></div>
+        <div class="cover-orbit cover-orbit-one" data-cover-orbit></div>
+        <div class="cover-orbit cover-orbit-two" data-cover-orbit></div>
 
-    <div class="hero-card">
-        <p class="chip">Disponível para projetos</p>
-        <h2 class="section-title">Código limpo. Arquitetura simples. Resultado sólido.</h2>
-        <p>
-            Experiência com <strong>Django, Java, APIs, bancos de dados e automação</strong>, 
-            além de robótica competitiva (FTC). Foco em performance, organização e entrega confiável.
-        </p>
-        <div class="helper-links">
-            <a class="ghost-button" href="mailto:henriquevieiraperes@gmail.com">Falar por e-mail</a>
-        </div>
-    </div>
-</section>
-
-<section id="projetos">
-    <h2 class="section-title">Meus projetos</h2>
-    {% if projetos %}
-    <ul class="projetos-grid">
-        {% for projeto in projetos %}
-        <li class="projeto-card">
-            {% if projeto.capa %}
-            <img src="{{ projeto.capa.url }}" alt="Capa de {{ projeto.titulo }}">
-            {% endif %}
-            <div class="projeto-body">
-                <h2>{{ projeto.titulo }}</h2>
-                <p>{{ projeto.descricao|truncatechars:800 }}</p>
-                <div class="card-actions">
-                    {% if projeto.url %}
-                    <a class="button" href="{{ projeto.url }}" target="_blank" rel="noopener">Visitar projeto</a>
-                    {% endif %}
-                    {% if user.is_authenticated %}
-                    <a class="ghost-button" href="{% url 'editar_projeto' projeto.id %}">Editar</a>
-                    {% endif %}
+        <div class="cover-content">
+            <div class="cover-copy">
+                <p class="eyebrow" data-hero-item>Portfólio independente / 2026</p>
+                <h1 class="cover-title" aria-label="Henrique Vieira, desenvolvedor full-stack">
+                    <span data-hero-line>Henrique</span>
+                    <span data-hero-line>Vieira</span>
+                </h1>
+                <div class="cover-summary" data-hero-item>
+                    <p>
+                        Desenvolvedor full-stack transformando ideias em produtos digitais
+                        claros, rápidos e feitos para durar.
+                    </p>
+                    <span class="cover-edition">DEV / 01</span>
                 </div>
             </div>
-        </li>
-        {% endfor %}
-    </ul>
-    {% else %}
-    <div class="empty-state">
-        Ainda não há projetos cadastrados.
-    </div>
-    {% endif %}
-</section>
-<script>
-    const scrollLink = document.querySelector("[data-scroll]");
-    if (scrollLink) {
-        scrollLink.addEventListener("click", (event) => {
-            const target = document.querySelector(scrollLink.getAttribute("href"));
-            if (!target) {
-                return;
-            }
-            event.preventDefault();
-            const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-            const targetTop = target.getBoundingClientRect().top + window.scrollY;
 
-            if (prefersReducedMotion) {
-                window.scrollTo(0, targetTop);
-                return;
-            }
+            <figure class="cover-art" data-cover-art>
+                <div class="cover-art-frame" data-image-frame>
+                    {% if projeto_destaque and projeto_destaque.capa %}
+                    <img
+                        src="{{ projeto_destaque.capa.url }}"
+                        alt="Capa do projeto {{ projeto_destaque.titulo }}"
+                        data-project-image
+                    >
+                    {% endif %}
+                    <div class="image-fallback" aria-hidden="true">
+                        <span>HV</span>
+                        <small>FULL / STACK</small>
+                    </div>
+                    <div class="cover-art-shade"></div>
+                </div>
+                <figcaption>
+                    <span>Projeto em destaque</span>
+                    <strong>{% if projeto_destaque %}{{ projeto_destaque.titulo }}{% else %}Em construção{% endif %}</strong>
+                </figcaption>
+            </figure>
 
-            const startTop = window.scrollY;
-            const distance = targetTop - startTop;
-            const duration = 600;
-            let startTime = null;
+            <div class="cover-facts" data-hero-item>
+                <div><span>Base</span><strong>Brasil</strong></div>
+                <div><span>Foco</span><strong>Web &amp; sistemas</strong></div>
+                <div><span>Status</span><strong>Disponível</strong></div>
+            </div>
+        </div>
 
-            const easeInOut = (t) => (t < 0.5
-                ? 2 * t * t
-                : 1 - Math.pow(-2 * t + 2, 2) / 2);
+        <a class="scroll-cue" href="#projetos" data-anchor-link data-hero-item>
+            <span>Explore os projetos</span>
+            <i aria-hidden="true"></i>
+        </a>
+    </section>
 
-            const step = (timestamp) => {
-                if (!startTime) startTime = timestamp;
-                const progress = Math.min((timestamp - startTime) / duration, 1);
-                const eased = easeInOut(progress);
-                window.scrollTo(0, startTop + distance * eased);
-                if (progress < 1) {
-                    requestAnimationFrame(step);
-                }
-            };
+    <section class="portfolio-section projects-section" id="projetos" data-section="projetos" data-horizontal-section>
+        <div class="projects-pin">
+            <header class="projects-heading">
+                <div>
+                    <p class="eyebrow">Trabalhos selecionados</p>
+                    <h2>Projetos <sup>{{ projetos|length|stringformat:"02d" }}</sup></h2>
+                </div>
+                <p>Role para explorar <span aria-hidden="true">→</span></p>
+            </header>
 
-            requestAnimationFrame(step);
-        });
-    }
-</script>
+            {% if projetos %}
+            <div class="projects-viewport" data-projects-viewport>
+                <div class="projects-track" data-projects-track>
+                    {% for projeto in projetos %}
+                    <article class="project-slide" data-project-card>
+                        <a
+                            class="project-link"
+                            href="{% url 'detalhe_projeto' projeto.id %}"
+                            aria-label="Abrir projeto {{ projeto.titulo }}"
+                        >
+                            <div class="project-media" data-image-frame>
+                                {% if projeto.capa %}
+                                <img
+                                    src="{{ projeto.capa.url }}"
+                                    alt="Capa de {{ projeto.titulo }}"
+                                    loading="lazy"
+                                    data-project-image
+                                >
+                                {% endif %}
+                                <div class="image-fallback" aria-hidden="true">
+                                    <span>{{ forloop.counter|stringformat:"02d" }}</span>
+                                    <small>HENRIQUE VIEIRA</small>
+                                </div>
+                                <div class="project-overlay">
+                                    <span class="project-open">Ver projeto <i aria-hidden="true">↗</i></span>
+                                    <h3>{{ projeto.titulo }}</h3>
+                                </div>
+                            </div>
+                            <footer class="project-meta">
+                                <span>{{ forloop.counter|stringformat:"02d" }}</span>
+                                <p>{{ projeto.titulo }}</p>
+                                <time datetime="{{ projeto.data_criacao|date:'Y-m-d' }}">{{ projeto.data_criacao|date:"Y" }}</time>
+                            </footer>
+                        </a>
+                        {% if user.is_authenticated %}
+                        <a class="project-edit" href="{% url 'editar_projeto' projeto.id %}">Editar</a>
+                        {% endif %}
+                    </article>
+                    {% endfor %}
+
+                    <div class="projects-end" aria-hidden="true">
+                        <span>Fim da seleção</span>
+                        <strong>Vamos criar<br>o próximo?</strong>
+                        <i>↘</i>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="projects-empty">Novos projetos estão a caminho.</div>
+            {% endif %}
+
+            <div class="projects-progress" aria-hidden="true">
+                <span data-project-progress></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="portfolio-section about-section" id="sobre" data-section="sobre">
+        <div class="about-marquee" aria-hidden="true" data-about-marquee>
+            SOBRE — SOBRE — SOBRE — SOBRE —
+        </div>
+
+        <div class="about-shell">
+            <header class="about-heading" data-reveal>
+                <p class="eyebrow">Sobre / contato</p>
+                <h2>Construo o que<br>precisa existir.</h2>
+            </header>
+
+            <div class="about-content">
+                <div class="about-statement" data-reveal>
+                    <p>
+                        Sou <strong>Henrique Vieira</strong>, técnico em Desenvolvimento de
+                        Sistemas e desenvolvedor full-stack. Uno engenharia, interface e
+                        visão de produto para entregar sistemas que funcionam no mundo real.
+                    </p>
+                    <p>
+                        Minha experiência passa por Django, APIs, bancos de dados,
+                        automação e robótica competitiva — sempre com simplicidade,
+                        desempenho e manutenção em primeiro plano.
+                    </p>
+                </div>
+
+                <dl class="about-details" data-reveal>
+                    <div><dt>Atuação</dt><dd>Full-stack</dd></div>
+                    <div><dt>Ferramentas</dt><dd>Django / Java / APIs</dd></div>
+                    <div><dt>Localização</dt><dd>Brasil / remoto</dd></div>
+                    <div><dt>Disponibilidade</dt><dd>Novos projetos</dd></div>
+                </dl>
+            </div>
+
+            <div class="about-contact" data-reveal>
+                <p>Tem uma ideia em mente?</p>
+                <a href="mailto:henriquevieiraperes@gmail.com">
+                    Vamos conversar <span aria-hidden="true">↗</span>
+                </a>
+            </div>
+
+            <footer class="about-footer">
+                <span>© 2026 Henrique Vieira</span>
+                <nav aria-label="Redes sociais">
+                    <a href="https://www.linkedin.com/in/henrique-vieira-274213362" target="_blank" rel="noopener">LinkedIn ↗</a>
+                    <a href="https://www.instagram.com/henrique.v07/" target="_blank" rel="noopener">Instagram ↗</a>
+                    <a href="mailto:henriquevieiraperes@gmail.com">E-mail ↗</a>
+                </nav>
+                <a href="#inicio" data-anchor-link>Voltar ao topo ↑</a>
+            </footer>
+        </div>
+    </section>
+</div>
 {% endblock %}

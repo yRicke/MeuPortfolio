@@ -1,14 +1,23 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, redirect, render
 from app.models import Projeto
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.urls import reverse
 
 # Create your views here.
 
 def index(request):
-    projetos = Projeto.objects.all()
-    return render(request, 'index.html', {'projetos': projetos})
+    projetos = Projeto.objects.order_by('-data_criacao')
+    return render(request, 'index.html', {
+        'projetos': projetos,
+        'projeto_destaque': projetos.first(),
+    })
+
+
+def detalhe_projeto(request, projeto_id):
+    projeto = get_object_or_404(Projeto, id=projeto_id)
+    return render(request, 'detalhe_projeto.html', {'projeto': projeto})
 
 @login_required(login_url='index')
 def adicionar_projeto(request):
@@ -70,4 +79,4 @@ def sair(request):
     return redirect('index')
 
 def sobre(request):
-    return render(request, 'sobre.html')
+    return redirect(f'{reverse("index")}#sobre')

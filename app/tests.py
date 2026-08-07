@@ -5,6 +5,7 @@ from tempfile import TemporaryDirectory
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
+from django.urls import reverse
 from PIL import Image
 
 from app.models import Projeto
@@ -120,3 +121,49 @@ class ConversaoDeCapaTest(TestCase):
             projeto.save()
 
         self.assertTrue(caminho_compartilhado.exists())
+
+
+class PortfolioViewTest(TestCase):
+    def setUp(self):
+        self.projeto = Projeto.objects.create(
+            titulo='Projeto de teste',
+            descricao='Descrição completa do projeto.',
+            capa='projetos/capas/teste.webp',
+            url='https://example.com/',
+        )
+
+    def test_home_exibe_galeria_horizontal_e_link_do_projeto(self):
+        resposta = self.client.get(reverse('index'))
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertContains(resposta, 'data-horizontal-section')
+        self.assertContains(resposta, 'data-project-card')
+        self.assertContains(
+            resposta,
+            reverse('detalhe_projeto', args=[self.projeto.id]),
+        )
+        self.assertEqual(resposta.context['projeto_destaque'], self.projeto)
+
+    def test_pagina_exclusiva_exibe_dados_do_projeto(self):
+        resposta = self.client.get(
+            reverse('detalhe_projeto', args=[self.projeto.id]),
+        )
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertContains(resposta, self.projeto.titulo)
+        self.assertContains(resposta, self.projeto.descricao)
+        self.assertContains(resposta, self.projeto.url)
+
+    def test_pagina_exclusiva_retorna_404_para_projeto_inexistente(self):
+        resposta = self.client.get(reverse('detalhe_projeto', args=[999]))
+
+        self.assertEqual(resposta.status_code, 404)
+
+    def test_rota_sobre_redireciona_para_secao_da_home(self):
+        resposta = self.client.get(reverse('sobre'))
+
+        self.assertRedirects(
+            resposta,
+            f'{reverse("index")}#sobre',
+            fetch_redirect_response=False,
+        )

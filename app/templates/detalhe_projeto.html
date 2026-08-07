@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}{{ projeto.titulo }} — Henrique Vieira{% endblock %}
+{% block body_class %}project-detail-page{% endblock %}
+
+{% block content %}
+<article class="project-detail" data-project-detail>
+    <header class="project-detail-hero">
+        <div class="project-detail-media" data-image-frame>
+            {% if projeto.capa %}
+            <img src="{{ projeto.capa.url }}" alt="Capa de {{ projeto.titulo }}" data-project-image>
+            {% endif %}
+            <div class="image-fallback" aria-hidden="true">
+                <span>HV</span>
+                <small>CASE / STUDY</small>
+            </div>
+            <div class="project-detail-shade"></div>
+        </div>
+        <div class="project-detail-title">
+            <p class="eyebrow">Projeto / {{ projeto.data_criacao|date:"Y" }}</p>
+            <h1>{{ projeto.titulo }}</h1>
+        </div>
+    </header>
+
+    <div class="project-detail-body">
+        <div class="project-detail-index">
+            <span>Case study</span>
+            <time datetime="{{ projeto.data_criacao|date:'Y-m-d' }}">{{ projeto.data_criacao|date:"d.m.Y" }}</time>
+        </div>
+        <div class="project-detail-copy" data-reveal>
+            <p>{{ projeto.descricao|linebreaksbr }}</p>
+            <div class="project-detail-actions">
+                {% if projeto.url %}
+                <a class="button" href="{{ projeto.url }}" target="_blank" rel="noopener">Visitar projeto ↗</a>
+                {% endif %}
+                <a class="ghost-button" href="{% url 'index' %}#projetos">Voltar aos projetos</a>
+                {% if user.is_authenticated %}
+                <a class="ghost-button" href="{% url 'editar_projeto' projeto.id %}">Editar projeto</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <footer class="project-detail-next">
+        <span>Próximo capítulo</span>
+        <a href="{% url 'index' %}#sobre">Trabalhe comigo <i aria-hidden="true">↗</i></a>
+    </footer>
+</article>
+{% endblock %}
