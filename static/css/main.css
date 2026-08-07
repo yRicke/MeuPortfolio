@@ -1499,12 +1499,13 @@ button {
   clip-path: polygon(0 0, calc(100% - 26px) 0, 100% 26px, 100% 100%, 26px 100%, 0 calc(100% - 26px));
 }
 
-.project-detail-signature > span {
-  margin: auto 0;
-  color: var(--primary-strong);
-  font-family: "Anton", "Impact", sans-serif;
-  font-size: clamp(5rem, 9vw, 8.5rem);
-  line-height: 0.8;
+.project-detail-signature-logo {
+  width: min(72%, 180px);
+  max-height: 170px;
+  margin: auto;
+  object-fit: contain;
+  opacity: 0.9;
+  filter: drop-shadow(0 18px 34px rgba(8, 5, 12, 0.34));
 }
 
 .project-detail-signature div {
@@ -2588,8 +2589,9 @@ input[type="file"].capa-input {
     min-height: 210px;
   }
 
-  .project-detail-signature > span {
-    font-size: 6.5rem;
+  .project-detail-signature-logo {
+    width: min(52%, 150px);
+    max-height: 120px;
   }
 
   .project-detail-next {

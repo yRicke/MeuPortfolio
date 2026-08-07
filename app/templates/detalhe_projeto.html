@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}{{ projeto.titulo }} — Henrique Vieira{% endblock %}
 {% block body_class %}project-detail-page{% endblock %}
@@ -125,7 +126,11 @@
             </div>
 
             <aside class="project-detail-signature" data-reveal aria-hidden="true">
-                <span>HV</span>
+                <img
+                    class="project-detail-signature-logo"
+                    src="{% static 'images/logo-hv.webp' %}"
+                    alt=""
+                >
                 <div>
                     <small>Selected work</small>
                     <small>Digital portfolio</small>

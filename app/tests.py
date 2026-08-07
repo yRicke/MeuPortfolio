@@ -282,6 +282,7 @@ class PortfolioViewTest(TestCase):
         self.assertNotContains(resposta, 'project-detail-slide-label')
         self.assertContains(resposta, 'project-detail-overview')
         self.assertContains(resposta, 'project-detail-signature')
+        self.assertContains(resposta, 'project-detail-signature-logo')
         self.assertContains(resposta, 'project-detail-next-footer')
         self.assertContains(resposta, 'datetime="2025-08"')
         self.assertContains(resposta, 'Desenvolvido em')
