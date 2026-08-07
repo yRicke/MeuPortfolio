@@ -17,18 +17,88 @@
             <div class="project-detail-shade"></div>
         </div>
         <div class="project-detail-title">
-            <p class="eyebrow">Projeto / {{ projeto.data_criacao|date:"Y" }}</p>
+            <p class="eyebrow">
+                Projeto / {% if projeto.data_desenvolvimento %}{{ projeto.data_desenvolvimento|date:"Y" }}{% else %}{{ projeto.data_criacao|date:"Y" }}{% endif %}
+            </p>
             <h1>{{ projeto.titulo }}</h1>
         </div>
     </header>
 
-    <div class="project-detail-body">
-        <div class="project-detail-index">
-            <span>Case study</span>
-            <time datetime="{{ projeto.data_criacao|date:'Y-m-d' }}">{{ projeto.data_criacao|date:"d.m.Y" }}</time>
+    {% if imagens_projeto %}
+    <section class="project-gallery" data-project-gallery aria-label="Galeria de imagens de {{ projeto.titulo }}">
+        <header class="project-gallery-heading">
+            <div>
+                <p class="eyebrow">Galeria / projeto</p>
+                <h2>Imagens em movimento</h2>
+            </div>
+            <span>{{ imagens_projeto|length|add:"1"|stringformat:"02d" }} imagens</span>
+        </header>
+
+        <div class="project-gallery-viewport">
+            <div class="project-gallery-track" data-project-gallery-track>
+                <div class="project-gallery-group" data-project-gallery-group>
+                    <figure class="project-gallery-slide">
+                        <div class="project-gallery-media">
+                            <img src="{{ projeto.capa.url }}" alt="Capa de {{ projeto.titulo }}">
+                            <span class="card-frame-lines" aria-hidden="true"></span>
+                        </div>
+                        <figcaption><span>01</span> Header / capa</figcaption>
+                    </figure>
+                    {% for item in imagens_projeto %}
+                    <figure class="project-gallery-slide">
+                        <div class="project-gallery-media">
+                            <img
+                                src="{{ item.imagem.url }}"
+                                alt="Imagem {{ forloop.counter }} do projeto {{ projeto.titulo }}"
+                                loading="lazy"
+                            >
+                            <span class="card-frame-lines" aria-hidden="true"></span>
+                        </div>
+                        <figcaption>
+                            <span>{{ forloop.counter|add:"1"|stringformat:"02d" }}</span>
+                            Imagem do projeto
+                        </figcaption>
+                    </figure>
+                    {% endfor %}
+                </div>
+
+                <div class="project-gallery-group" aria-hidden="true">
+                    <figure class="project-gallery-slide">
+                        <div class="project-gallery-media">
+                            <img src="{{ projeto.capa.url }}" alt="">
+                            <span class="card-frame-lines"></span>
+                        </div>
+                        <figcaption><span>01</span> Header / capa</figcaption>
+                    </figure>
+                    {% for item in imagens_projeto %}
+                    <figure class="project-gallery-slide">
+                        <div class="project-gallery-media">
+                            <img src="{{ item.imagem.url }}" alt="" loading="lazy">
+                            <span class="card-frame-lines"></span>
+                        </div>
+                        <figcaption>
+                            <span>{{ forloop.counter|add:"1"|stringformat:"02d" }}</span>
+                            Imagem do projeto
+                        </figcaption>
+                    </figure>
+                    {% endfor %}
+                </div>
+            </div>
         </div>
+    </section>
+    {% endif %}
+
+    <div class="project-detail-body">
         <div class="project-detail-copy" data-reveal>
             <p>{{ projeto.descricao|linebreaksbr }}</p>
+            {% if projeto.data_desenvolvimento %}
+            <div class="project-development-date">
+                <span>Desenvolvido em</span>
+                <time datetime="{{ projeto.data_desenvolvimento|date:'Y-m' }}">
+                    {{ projeto.data_desenvolvimento|date:"F \d\e Y" }}
+                </time>
+            </div>
+            {% endif %}
             <div class="project-detail-actions">
                 {% if projeto.url %}
                 <a class="button" href="{{ projeto.url }}" target="_blank" rel="noopener">Visitar projeto ↗</a>

@@ -5,9 +5,14 @@ from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models, router, transaction
 from django.db.models import Max, Q
+from django.db.models.signals import post_delete
+from django.dispatch import receiver
 from PIL import Image, ImageOps
 
 # Create your models here.
+
+NAO_INFORMADO = object()
+
 
 class Projeto(models.Model):
     titulo = models.CharField(max_length=200)
@@ -15,6 +20,7 @@ class Projeto(models.Model):
     capa = models.ImageField(upload_to='projetos/capas/', default='projetos/capas/default.png')
     url = models.URLField(blank=True)
     data_criacao = models.DateTimeField(auto_now_add=True)
+    data_desenvolvimento = models.DateField(blank=True, null=True)
     ordem = models.PositiveIntegerField(default=0, db_index=True)
     destaque = models.BooleanField(default=False)
 
@@ -46,7 +52,7 @@ class Projeto(models.Model):
             )
 
         if nova_capa:
-            self.capa = self._converter_capa_para_webp(self.capa)
+            self.capa = self._converter_imagem_para_webp(self.capa)
 
         super().save(*args, **kwargs)
 
@@ -71,11 +77,11 @@ class Projeto(models.Model):
             armazenamento.delete(nome)
 
     @staticmethod
-    def _converter_capa_para_webp(capa):
-        nome = f'{Path(capa.name).stem or "imagem"}.webp'
+    def _converter_imagem_para_webp(arquivo):
+        nome = f'{Path(arquivo.name).stem or "imagem"}.webp'
         conteudo = BytesIO()
 
-        with Image.open(capa) as imagem:
+        with Image.open(arquivo) as imagem:
             if imagem.format not in ('PNG', 'JPEG', 'WEBP'):
                 raise ValidationError(
                     'Formato inválido. Envie uma imagem PNG, JPEG ou WebP.'
@@ -96,8 +102,17 @@ class Projeto(models.Model):
 
         return ContentFile(conteudo.getvalue(), name=nome)
 
+    _converter_capa_para_webp = _converter_imagem_para_webp
+
     @classmethod
-    def criar_projeto(cls, titulo, descricao, capa, url=None):
+    def criar_projeto(
+        cls,
+        titulo,
+        descricao,
+        capa,
+        url=None,
+        data_desenvolvimento=None,
+    ):
         maior_ordem = cls.objects.aggregate(maior=Max('ordem'))['maior']
         primeiro_projeto = maior_ordem is None
         projeto = cls(
@@ -105,13 +120,21 @@ class Projeto(models.Model):
             descricao=descricao,
             capa=capa,
             url=url or '',
+            data_desenvolvimento=data_desenvolvimento,
             ordem=0 if primeiro_projeto else maior_ordem + 1,
             destaque=primeiro_projeto,
         )
         projeto.save()
         return projeto
 
-    def atualizar_projeto(self, titulo=None, descricao=None, capa=None, url=None):
+    def atualizar_projeto(
+        self,
+        titulo=None,
+        descricao=None,
+        capa=None,
+        url=None,
+        data_desenvolvimento=NAO_INFORMADO,
+    ):
         if titulo:
             self.titulo = titulo
         if descricao:
@@ -120,8 +143,26 @@ class Projeto(models.Model):
             self.capa = capa
         if url is not None:
             self.url = url
+        if data_desenvolvimento is not NAO_INFORMADO:
+            self.data_desenvolvimento = data_desenvolvimento
         self.save()
         return self
+
+    def adicionar_imagens(self, arquivos):
+        maior_ordem = self.imagens.aggregate(maior=Max('ordem'))['maior']
+        proxima_ordem = 0 if maior_ordem is None else maior_ordem + 1
+        imagens = []
+
+        for deslocamento, arquivo in enumerate(arquivos):
+            imagens.append(
+                ImagemProjeto.objects.create(
+                    projeto=self,
+                    imagem=arquivo,
+                    ordem=proxima_ordem + deslocamento,
+                )
+            )
+
+        return imagens
 
     def deletar_projeto(self):
         era_destaque = self.destaque
@@ -131,3 +172,71 @@ class Projeto(models.Model):
             if proximo_destaque:
                 proximo_destaque.destaque = True
                 proximo_destaque.save(update_fields=('destaque',))
+
+
+class ImagemProjeto(models.Model):
+    projeto = models.ForeignKey(
+        Projeto,
+        on_delete=models.CASCADE,
+        related_name='imagens',
+    )
+    imagem = models.ImageField(upload_to='projetos/galeria/')
+    ordem = models.PositiveIntegerField(default=0)
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('ordem', 'pk')
+
+    def __str__(self):
+        return f'{self.projeto.titulo} — imagem {self.ordem + 1}'
+
+    def save(self, *args, **kwargs):
+        banco = kwargs.get('using') or router.db_for_write(type(self), instance=self)
+        campos_atualizados = kwargs.get('update_fields')
+        deve_salvar_imagem = (
+            campos_atualizados is None or 'imagem' in campos_atualizados
+        )
+        nova_imagem = deve_salvar_imagem and self.imagem and not self.imagem._committed
+        imagem_anterior = None
+
+        if nova_imagem and self.pk:
+            imagem_anterior = (
+                type(self).objects.using(banco).filter(pk=self.pk)
+                .values_list('imagem', flat=True)
+                .first()
+            )
+
+        if nova_imagem:
+            self.imagem = Projeto._converter_imagem_para_webp(self.imagem)
+
+        super().save(*args, **kwargs)
+
+        if imagem_anterior and imagem_anterior != self.imagem.name:
+            armazenamento = self.imagem.storage
+            transaction.on_commit(
+                lambda: type(self)._excluir_imagem_sem_uso(
+                    imagem_anterior,
+                    armazenamento,
+                    banco,
+                ),
+                using=banco,
+            )
+
+    @classmethod
+    def _excluir_imagem_sem_uso(cls, nome, armazenamento, banco):
+        ainda_esta_em_uso = cls.objects.using(banco).filter(imagem=nome).exists()
+        if nome and not ainda_esta_em_uso:
+            armazenamento.delete(nome)
+
+
+@receiver(post_delete, sender=ImagemProjeto)
+def excluir_arquivo_da_imagem(sender, instance, using, **kwargs):
+    if not instance.imagem or not instance.imagem.name:
+        return
+
+    nome = instance.imagem.name
+    armazenamento = instance.imagem.storage
+    transaction.on_commit(
+        lambda: sender._excluir_imagem_sem_uso(nome, armazenamento, using),
+        using=using,
+    )

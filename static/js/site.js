@@ -111,6 +111,28 @@ document.addEventListener('DOMContentLoaded', () => {
       .from('.project-detail-title > *', { y: 45, autoAlpha: 0, stagger: 0.12 }, '-=0.7');
   }
 
+  const galeria = document.querySelector('[data-project-gallery]');
+  const trilhoGaleria = galeria?.querySelector('[data-project-gallery-track]');
+  const grupoGaleria = galeria?.querySelector('[data-project-gallery-group]');
+
+  if (trilhoGaleria && grupoGaleria && !movimentoReduzido) {
+    const animacaoGaleria = gsap.to(trilhoGaleria, {
+      x: () => -grupoGaleria.offsetWidth,
+      duration: Math.max(20, grupoGaleria.scrollWidth / 65),
+      ease: 'none',
+      repeat: -1,
+      repeatRefresh: true,
+    });
+
+    const pausarGaleria = () => animacaoGaleria.pause();
+    const retomarGaleria = () => animacaoGaleria.resume();
+
+    galeria.addEventListener('pointerenter', pausarGaleria);
+    galeria.addEventListener('pointerleave', retomarGaleria);
+    galeria.addEventListener('focusin', pausarGaleria);
+    galeria.addEventListener('focusout', retomarGaleria);
+  }
+
   window.addEventListener('load', () => ScrollTrigger.refresh());
 });
 

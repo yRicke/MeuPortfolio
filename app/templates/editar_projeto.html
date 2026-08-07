@@ -10,6 +10,7 @@
             <form method="post" enctype="multipart/form-data">
                 {% csrf_token %}
                 {% include "partials/capa_dropzone.html" with rotulo="Trocar capa (opcional)" capa_url=projeto.capa.url %}
+                {% include "partials/galeria_upload.html" with imagens_existentes=projeto.imagens.all %}
                 <div class="field">
                     <label for="titulo">Título</label>
                     <input type="text" name="titulo" id="titulo" value="{{ projeto.titulo }}" required>
@@ -17,6 +18,15 @@
                 <div class="field">
                     <label for="descricao">Descrição</label>
                     <textarea name="descricao" id="descricao" required>{{ projeto.descricao }}</textarea>
+                </div>
+                <div class="field">
+                    <label for="data_desenvolvimento">Data de desenvolvimento</label>
+                    <input
+                        type="month"
+                        name="data_desenvolvimento"
+                        id="data_desenvolvimento"
+                        value="{% if projeto.data_desenvolvimento %}{{ projeto.data_desenvolvimento|date:'Y-m' }}{% endif %}"
+                    >
                 </div>
                 <div class="field">
                     <label for="url">URL (opcional)</label>

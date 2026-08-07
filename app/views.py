@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -13,6 +14,13 @@ from django.views.decorators.http import require_http_methods
 from app.models import Projeto
 
 # Create your views here.
+
+
+def _interpretar_mes(valor):
+    if not valor:
+        return None
+    return datetime.strptime(valor, '%Y-%m').date().replace(day=1)
+
 
 def index(request):
     projetos = Projeto.objects.all()
@@ -90,8 +98,15 @@ def painel_projetos(request):
 
 
 def detalhe_projeto(request, projeto_id):
-    projeto = get_object_or_404(Projeto, id=projeto_id)
-    return render(request, 'detalhe_projeto.html', {'projeto': projeto})
+    projeto = get_object_or_404(
+        Projeto.objects.prefetch_related('imagens'),
+        id=projeto_id,
+    )
+    return render(request, 'detalhe_projeto.html', {
+        'projeto': projeto,
+        'imagens_projeto': list(projeto.imagens.all()),
+    })
+
 
 @login_required(login_url='index')
 def adicionar_projeto(request):
@@ -100,27 +115,61 @@ def adicionar_projeto(request):
         descricao = request.POST.get('descricao')
         capa = request.FILES.get('capa')
         url = request.POST.get('url', None)
+        data_desenvolvimento = request.POST.get('data_desenvolvimento')
+        imagens = request.FILES.getlist('imagens')
         try:
-            Projeto.criar_projeto(titulo, descricao, capa, url)
+            with transaction.atomic():
+                projeto = Projeto.criar_projeto(
+                    titulo,
+                    descricao,
+                    capa,
+                    url,
+                    _interpretar_mes(data_desenvolvimento),
+                )
+                projeto.adicionar_imagens(imagens)
             messages.success(request, 'Projeto adicionado com sucesso.')
+        except (TypeError, ValueError):
+            messages.error(request, 'Informe uma data de desenvolvimento válida.')
         except Exception:
-            messages.error(request, 'Erro ao adicionar projeto. Verifique os dados e tente novamente.')
+            messages.error(
+                request,
+                'Erro ao adicionar projeto. Verifique os dados e tente novamente.',
+            )
         return redirect('index')
     return render(request, 'adicionar_projeto.html')
 
+
 @login_required(login_url='index')
 def editar_projeto(request, projeto_id):
-    projeto = Projeto.objects.get(id=projeto_id)
+    projeto = get_object_or_404(
+        Projeto.objects.prefetch_related('imagens'),
+        id=projeto_id,
+    )
     if request.method == 'POST':
         titulo = request.POST.get('titulo')
         descricao = request.POST.get('descricao')
         capa = request.FILES.get('capa')
         url = request.POST.get('url', None)
+        data_desenvolvimento = request.POST.get('data_desenvolvimento')
+        novas_imagens = request.FILES.getlist('imagens')
+        imagens_para_remover = request.POST.getlist('remover_imagens')
         if capa is None:
             capa = projeto.capa
         try:
-            projeto.atualizar_projeto(titulo, descricao, capa, url)
+            with transaction.atomic():
+                projeto.atualizar_projeto(
+                    titulo,
+                    descricao,
+                    capa,
+                    url,
+                    _interpretar_mes(data_desenvolvimento),
+                )
+                projeto.imagens.filter(pk__in=imagens_para_remover).delete()
+                projeto.adicionar_imagens(novas_imagens)
             messages.success(request, 'Projeto atualizado com sucesso.')
+            return redirect('editar_projeto', projeto_id=projeto.id)
+        except (TypeError, ValueError):
+            messages.error(request, 'Informe uma data de desenvolvimento válida.')
         except Exception:
             messages.error(request, 'Erro ao atualizar projeto.')
     return render(request, 'editar_projeto.html', {'projeto': projeto})

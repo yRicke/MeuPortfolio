@@ -9,6 +9,7 @@
     <form class="form-card" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% include "partials/capa_dropzone.html" with rotulo="Capa do projeto" obrigatoria=True %}
+        {% include "partials/galeria_upload.html" %}
         <div class="field">
             <label for="titulo">Título</label>
             <input type="text" name="titulo" id="titulo" placeholder="Título do projeto" required>
@@ -16,6 +17,10 @@
         <div class="field">
             <label for="descricao">Descrição</label>
             <textarea name="descricao" id="descricao" placeholder="Descrição do projeto" required></textarea>
+        </div>
+        <div class="field">
+            <label for="data_desenvolvimento">Data de desenvolvimento</label>
+            <input type="month" name="data_desenvolvimento" id="data_desenvolvimento">
         </div>
         <div class="field">
             <label for="url">URL (opcional)</label>

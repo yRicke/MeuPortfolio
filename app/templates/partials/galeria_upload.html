@@ -1,0 +1,40 @@
+<div class="field gallery-upload" data-gallery-upload>
+    <label for="imagens">Imagens adicionais</label>
+    <input
+        class="capa-input gallery-input"
+        type="file"
+        name="imagens"
+        id="imagens"
+        accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+        multiple
+        data-gallery-input
+    >
+    <label class="capa-dropzone gallery-dropzone" for="imagens" data-gallery-dropzone>
+        <span class="capa-dropzone-icon" aria-hidden="true">+</span>
+        <span class="capa-dropzone-title" data-gallery-title>
+            Arraste as imagens aqui ou clique para selecionar
+        </span>
+        <span class="capa-dropzone-help">PNG, JPEG ou WebP — múltiplos arquivos</span>
+    </label>
+    <p class="capa-upload-error" data-gallery-error role="alert" hidden></p>
+
+    <div class="gallery-preview is-hidden" data-gallery-preview aria-live="polite"></div>
+
+    {% if imagens_existentes %}
+    <div class="gallery-existing">
+        <div class="gallery-existing-heading">
+            <span>Galeria atual</span>
+            <small>Marque as imagens que deseja remover</small>
+        </div>
+        <div class="gallery-existing-grid">
+            {% for item in imagens_existentes %}
+            <label class="gallery-existing-item">
+                <img src="{{ item.imagem.url }}" alt="Imagem adicional {{ forloop.counter }} de {{ projeto.titulo }}">
+                <input type="checkbox" name="remover_imagens" value="{{ item.id }}">
+                <span>Remover</span>
+            </label>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>

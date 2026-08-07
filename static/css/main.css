@@ -1196,26 +1196,115 @@ button {
   text-transform: uppercase;
 }
 
-.project-detail-body {
-  width: min(1280px, calc(100% - 72px));
-  margin: 0 auto;
-  padding: clamp(70px, 10vw, 150px) 0;
-  display: grid;
-  grid-template-columns: 0.48fr 1.52fr;
-  gap: 60px;
+.project-gallery {
+  padding: clamp(70px, 9vw, 130px) 0;
+  overflow: hidden;
+  background: var(--night);
+  color: var(--white);
 }
 
-.project-detail-index {
+.project-gallery-heading {
+  width: min(1440px, calc(100% - 72px));
+  margin: 0 auto clamp(28px, 4vw, 52px);
   display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 0.66rem;
+  align-items: end;
+  justify-content: space-between;
+  gap: 32px;
+}
+
+.project-gallery-heading h2 {
+  margin: 8px 0 0;
+  font-family: "Anton", "Impact", sans-serif;
+  font-size: clamp(2.8rem, 6vw, 6.5rem);
+  font-weight: 400;
+  line-height: 0.9;
+  text-transform: uppercase;
+}
+
+.project-gallery-heading > span,
+.project-gallery-slide figcaption {
+  font-size: 0.65rem;
+  font-weight: 700;
   letter-spacing: 0.13em;
   text-transform: uppercase;
 }
 
-.project-detail-index time {
-  color: var(--muted);
+.project-gallery-heading > span {
+  color: var(--primary-strong);
+}
+
+.project-gallery-viewport {
+  width: 100%;
+  overflow: hidden;
+}
+
+.project-gallery-track,
+.project-gallery-group {
+  display: flex;
+  align-items: stretch;
+  width: max-content;
+}
+
+.project-gallery-track {
+  will-change: transform;
+}
+
+.project-gallery-group {
+  gap: clamp(18px, 2vw, 32px);
+  padding-right: clamp(18px, 2vw, 32px);
+}
+
+.project-gallery-slide {
+  width: clamp(310px, 62vw, 900px);
+  margin: 0;
+  flex: 0 0 auto;
+}
+
+.project-gallery-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--accent);
+  clip-path: polygon(0 0, calc(100% - 28px) 0, 100% 28px, 100% 100%, 28px 100%, 0 calc(100% - 28px));
+}
+
+.project-gallery-media::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 48%, rgba(32, 13, 42, 0.5) 100%);
+}
+
+.project-gallery-media img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-gallery-media .card-frame-lines {
+  z-index: 3;
+}
+
+.project-gallery-slide figcaption {
+  padding-top: 12px;
+  display: flex;
+  gap: 14px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.project-gallery-slide figcaption span {
+  color: var(--white);
+}
+
+.project-detail-body {
+  width: min(1040px, calc(100% - 72px));
+  margin: 0 auto;
+  padding: clamp(70px, 10vw, 150px) 0;
 }
 
 .project-detail-copy > p {
@@ -1223,6 +1312,31 @@ button {
   margin: 0;
   font-size: clamp(1.16rem, 2vw, 1.7rem);
   line-height: 1.65;
+}
+
+.project-development-date {
+  max-width: 850px;
+  margin-top: clamp(38px, 6vw, 72px);
+  padding-top: 20px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 24px;
+  border-top: 1px solid var(--border);
+  text-transform: uppercase;
+}
+
+.project-development-date span {
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.project-development-date time {
+  font-family: "Anton", "Impact", sans-serif;
+  font-size: clamp(1.8rem, 4vw, 3.5rem);
+  line-height: 1;
 }
 
 .project-detail-actions {
@@ -1303,6 +1417,7 @@ label {
 
 input[type="text"],
 input[type="password"],
+input[type="month"],
 textarea {
   width: 100%;
   padding: 13px 14px;
@@ -1470,6 +1585,98 @@ input[type="file"].capa-input {
   border-radius: 12px;
   background: var(--bg-soft);
   object-fit: contain;
+}
+
+.gallery-preview,
+.gallery-existing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+}
+
+.gallery-preview.is-hidden {
+  display: none;
+}
+
+.gallery-preview-item {
+  min-width: 0;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-soft);
+}
+
+.gallery-preview-item img,
+.gallery-existing-item img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  border-radius: 7px;
+  object-fit: cover;
+}
+
+.gallery-preview-item figcaption {
+  margin-top: 7px;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gallery-existing {
+  margin-top: 24px;
+  display: grid;
+  gap: 12px;
+}
+
+.gallery-existing-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.gallery-existing-heading span {
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gallery-existing-heading small {
+  color: var(--muted);
+}
+
+.gallery-existing-item {
+  position: relative;
+  padding: 8px;
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-soft);
+  cursor: pointer;
+  transition: border-color 0.25s ease, opacity 0.25s ease;
+}
+
+.gallery-existing-item input {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 18px;
+  height: 18px;
+  accent-color: var(--primary-strong);
+}
+
+.gallery-existing-item span {
+  color: var(--muted);
+  font-size: 0.65rem;
+}
+
+.gallery-existing-item:has(input:checked) {
+  border-color: #c97b8b;
+  opacity: 0.52;
 }
 
 /* Organizador de projetos */
@@ -2075,8 +2282,23 @@ input[type="file"].capa-input {
 
   .project-detail-body {
     width: calc(100% - 36px);
-    grid-template-columns: 1fr;
-    gap: 36px;
+  }
+
+  .project-gallery-heading {
+    width: calc(100% - 36px);
+    align-items: start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .project-gallery-slide {
+    width: 88vw;
+  }
+
+  .project-development-date {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
   }
 
   .project-detail-next {
@@ -2184,5 +2406,17 @@ input[type="file"].capa-input {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .project-gallery-viewport {
+    overflow-x: auto;
+  }
+
+  .project-gallery-track {
+    transform: none !important;
+  }
+
+  .project-gallery-group[aria-hidden="true"] {
+    display: none;
   }
 }

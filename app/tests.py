@@ -1,4 +1,5 @@
 import json
+from datetime import date
 from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -10,7 +11,7 @@ from django.test import TestCase
 from django.urls import reverse
 from PIL import Image
 
-from app.models import Projeto
+from app.models import ImagemProjeto, Projeto
 
 
 class ConversaoDeCapaTest(TestCase):
@@ -124,6 +125,41 @@ class ConversaoDeCapaTest(TestCase):
 
         self.assertTrue(caminho_compartilhado.exists())
 
+    def test_converte_imagens_adicionais_para_webp_e_preserva_ordem(self):
+        projeto = Projeto.objects.create(
+            titulo='Projeto com galeria',
+            descricao='Descrição',
+            capa=self.criar_imagem('capa.png', 'PNG'),
+        )
+
+        imagens = projeto.adicionar_imagens([
+            self.criar_imagem('primeira.jpg', 'JPEG'),
+            self.criar_imagem('segunda.png', 'PNG'),
+        ])
+
+        self.assertEqual([item.ordem for item in imagens], [0, 1])
+        self.assertEqual(projeto.imagens.count(), 2)
+        for item in imagens:
+            self.assertTrue(item.imagem.name.endswith('.webp'))
+            with Image.open(item.imagem.path) as imagem_salva:
+                self.assertEqual(imagem_salva.format, 'WEBP')
+
+    def test_exclui_arquivo_quando_imagem_adicional_e_removida(self):
+        projeto = Projeto.objects.create(
+            titulo='Projeto com galeria',
+            descricao='Descrição',
+            capa=self.criar_imagem('capa.png', 'PNG'),
+        )
+        imagem = projeto.adicionar_imagens([
+            self.criar_imagem('galeria.png', 'PNG'),
+        ])[0]
+        caminho = Path(imagem.imagem.path)
+
+        with self.captureOnCommitCallbacks(execute=True):
+            imagem.delete()
+
+        self.assertFalse(caminho.exists())
+
 
 class PortfolioViewTest(TestCase):
     def setUp(self):
@@ -179,6 +215,40 @@ class PortfolioViewTest(TestCase):
         self.assertContains(resposta, self.projeto.titulo)
         self.assertContains(resposta, self.projeto.descricao)
         self.assertContains(resposta, self.projeto.url)
+
+    def test_pagina_exclusiva_exibe_galeria_infinita_e_data(self):
+        self.projeto.data_desenvolvimento = date(2025, 8, 1)
+        self.projeto.save(update_fields=('data_desenvolvimento',))
+        ImagemProjeto.objects.create(
+            projeto=self.projeto,
+            imagem='projetos/galeria/primeira.webp',
+            ordem=0,
+        )
+        ImagemProjeto.objects.create(
+            projeto=self.projeto,
+            imagem='projetos/galeria/segunda.webp',
+            ordem=1,
+        )
+
+        resposta = self.client.get(
+            reverse('detalhe_projeto', args=[self.projeto.id]),
+        )
+
+        self.assertContains(resposta, 'data-project-gallery')
+        self.assertContains(resposta, 'data-project-gallery-track')
+        self.assertContains(resposta, 'data-project-gallery-group', count=1)
+        self.assertContains(resposta, 'Header / capa', count=2)
+        self.assertContains(resposta, 'projetos/galeria/primeira.webp', count=2)
+        self.assertContains(resposta, 'projetos/galeria/segunda.webp', count=2)
+        self.assertContains(resposta, 'datetime="2025-08"')
+        self.assertContains(resposta, 'Desenvolvido em')
+
+    def test_pagina_exclusiva_sem_imagens_nao_exibe_carrossel(self):
+        resposta = self.client.get(
+            reverse('detalhe_projeto', args=[self.projeto.id]),
+        )
+
+        self.assertNotContains(resposta, 'data-project-gallery')
 
     def test_pagina_exclusiva_retorna_404_para_projeto_inexistente(self):
         resposta = self.client.get(reverse('detalhe_projeto', args=[999]))
@@ -311,3 +381,37 @@ class PainelProjetosTest(TestCase):
         self.projetos[1].refresh_from_db()
 
         self.assertTrue(self.projetos[1].destaque)
+
+    def test_edicao_salva_data_e_multiplas_imagens(self):
+        self.client.force_login(self.superusuario)
+
+        with TemporaryDirectory() as diretorio:
+            with self.settings(MEDIA_ROOT=diretorio):
+                resposta = self.client.post(
+                    reverse('editar_projeto', args=[self.projetos[0].pk]),
+                    data={
+                        'titulo': self.projetos[0].titulo,
+                        'descricao': self.projetos[0].descricao,
+                        'url': '',
+                        'data_desenvolvimento': '2026-03',
+                        'imagens': [
+                            ConversaoDeCapaTest.criar_imagem('um.png', 'PNG'),
+                            ConversaoDeCapaTest.criar_imagem('dois.jpg', 'JPEG'),
+                        ],
+                    },
+                )
+
+                self.assertRedirects(
+                    resposta,
+                    reverse('editar_projeto', args=[self.projetos[0].pk]),
+                )
+                self.projetos[0].refresh_from_db()
+                self.assertEqual(
+                    self.projetos[0].data_desenvolvimento,
+                    date(2026, 3, 1),
+                )
+                self.assertEqual(self.projetos[0].imagens.count(), 2)
+                self.assertTrue(all(
+                    item.imagem.name.endswith('.webp')
+                    for item in self.projetos[0].imagens.all()
+                ))
