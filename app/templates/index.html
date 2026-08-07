@@ -36,6 +36,11 @@
 
             <figure class="cover-art" data-cover-art>
                 <div class="cover-art-frame" data-image-frame>
+                    <span class="cover-card-label" aria-hidden="true">
+                        <b>01</b>
+                        <small>Projeto / destaque</small>
+                    </span>
+                    <span class="card-frame-lines" aria-hidden="true"></span>
                     {% if projeto_destaque and projeto_destaque.capa %}
                     <img
                         src="{{ projeto_destaque.capa.url }}"
@@ -85,6 +90,11 @@
                             aria-label="Abrir projeto {{ projeto.titulo }}"
                         >
                             <div class="project-media" data-image-frame>
+                                <span class="project-card-label" aria-hidden="true">
+                                    <b>{{ forloop.counter|stringformat:"02d" }}</b>
+                                    <small>HV / projeto</small>
+                                </span>
+                                <span class="card-frame-lines" aria-hidden="true"></span>
                                 {% if projeto.capa %}
                                 <img
                                     src="{{ projeto.capa.url }}"

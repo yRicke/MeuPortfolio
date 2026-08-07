@@ -138,6 +138,8 @@ class PortfolioViewTest(TestCase):
         self.assertEqual(resposta.status_code, 200)
         self.assertContains(resposta, 'data-horizontal-section')
         self.assertContains(resposta, 'data-project-card')
+        self.assertContains(resposta, 'project-card-label')
+        self.assertContains(resposta, 'cover-card-label')
         self.assertContains(resposta, 'data-section-curtain')
         self.assertContains(resposta, 'about-backdrop')
         self.assertContains(resposta, 'about-hv-bg-mobile.webp')
