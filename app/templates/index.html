@@ -133,6 +133,18 @@
 
     <section class="portfolio-section about-section" id="sobre" data-section="sobre">
         <div class="section-curtain about-curtain" data-section-curtain aria-hidden="true"></div>
+        <div class="about-backdrop" aria-hidden="true">
+            <div class="about-backdrop-frame">
+                <picture>
+                    <source
+                        media="(max-width: 768px)"
+                        srcset="{% static 'images/about-hv-bg-mobile.webp' %}"
+                    >
+                    <img src="{% static 'images/about-hv-bg.webp' %}" alt="">
+                </picture>
+                <span class="about-backdrop-shade"></span>
+            </div>
+        </div>
         <div class="about-marquee" aria-hidden="true" data-about-marquee>
             SOBRE — SOBRE — SOBRE — SOBRE —
         </div>

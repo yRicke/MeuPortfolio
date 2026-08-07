@@ -747,15 +747,52 @@ button {
 /* Sobre */
 .about-section {
   min-height: 100svh;
-  overflow: hidden;
-  background:
-    linear-gradient(90deg, rgba(12, 9, 16, 0.95) 0%, rgba(18, 13, 23, 0.78) 52%, rgba(20, 14, 27, 0.42) 100%),
-    url("../images/about-hv-bg.webp") center top / auto 100svh no-repeat,
-    var(--night);
+  overflow: clip;
+  isolation: isolate;
+  background: var(--night);
   color: var(--white);
 }
 
+.about-backdrop {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100svh;
+  margin-bottom: -100svh;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.about-backdrop-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.about-backdrop picture,
+.about-backdrop img,
+.about-backdrop-shade {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.about-backdrop img {
+  object-fit: cover;
+  object-position: center;
+}
+
+.about-backdrop-shade {
+  display: block;
+  background: linear-gradient(90deg, rgba(12, 9, 16, 0.95) 0%, rgba(18, 13, 23, 0.78) 52%, rgba(20, 14, 27, 0.42) 100%);
+}
+
 .about-marquee {
+  position: relative;
+  z-index: 2;
   width: max-content;
   margin-left: -4vw;
   padding-top: 72px;
@@ -1379,11 +1416,12 @@ input[type="file"].capa-input {
     font-size: 34vw;
   }
 
-  .about-section {
-    background:
-      linear-gradient(180deg, rgba(12, 9, 16, 0.9) 0%, rgba(18, 13, 23, 0.58) 52%, rgba(12, 9, 16, 0.78) 100%),
-      url("../images/about-hv-bg-mobile.webp") center top / auto 100svh no-repeat,
-      var(--night);
+  .about-backdrop img {
+    object-position: center 46%;
+  }
+
+  .about-backdrop-shade {
+    background: linear-gradient(180deg, rgba(12, 9, 16, 0.9) 0%, rgba(18, 13, 23, 0.58) 52%, rgba(12, 9, 16, 0.78) 100%);
   }
 
   .about-shell {
