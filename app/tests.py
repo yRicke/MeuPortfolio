@@ -2,6 +2,7 @@ from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
 from PIL import Image
@@ -59,6 +60,14 @@ class ConversaoDeCapaTest(TestCase):
             self.assertEqual(imagem_salva.mode, 'RGBA')
             self.assertEqual(imagem_salva.getpixel((0, 0))[3], 80)
 
+    def test_recusa_formato_de_imagem_nao_permitido(self):
+        with self.assertRaisesMessage(ValidationError, 'Formato inválido'):
+            Projeto.objects.create(
+                titulo='Projeto GIF',
+                descricao='Descrição',
+                capa=self.criar_imagem('animacao.gif', 'GIF'),
+            )
+
     def test_nao_reprocessa_capa_ao_atualizar_outros_campos(self):
         projeto = Projeto.objects.create(
             titulo='Projeto',
@@ -76,3 +85,38 @@ class ConversaoDeCapaTest(TestCase):
             list(Path(self.diretorio_de_midias.name).rglob('*')),
             arquivos_antes,
         )
+
+    def test_exclui_capa_anterior_depois_da_troca(self):
+        projeto = Projeto.objects.create(
+            titulo='Projeto',
+            descricao='Descrição',
+            capa=self.criar_imagem('capa-antiga.png', 'PNG'),
+        )
+        caminho_anterior = Path(projeto.capa.path)
+
+        projeto.capa = self.criar_imagem('capa-nova.jpg', 'JPEG')
+        with self.captureOnCommitCallbacks(execute=True):
+            projeto.save()
+
+        self.assertFalse(caminho_anterior.exists())
+        self.assertTrue(Path(projeto.capa.path).exists())
+        self.assertTrue(projeto.capa.name.endswith('.webp'))
+
+    def test_mantem_capa_anterior_quando_outro_projeto_a_utiliza(self):
+        projeto = Projeto.objects.create(
+            titulo='Primeiro projeto',
+            descricao='Descrição',
+            capa=self.criar_imagem('compartilhada.png', 'PNG'),
+        )
+        caminho_compartilhado = Path(projeto.capa.path)
+        Projeto.objects.create(
+            titulo='Segundo projeto',
+            descricao='Descrição',
+            capa=projeto.capa.name,
+        )
+
+        projeto.capa = self.criar_imagem('substituta.jpg', 'JPEG')
+        with self.captureOnCommitCallbacks(execute=True):
+            projeto.save()
+
+        self.assertTrue(caminho_compartilhado.exists())

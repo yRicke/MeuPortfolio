@@ -1,8 +1,9 @@
 from io import BytesIO
 from pathlib import Path
 
+from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
-from django.db import models
+from django.db import models, router, transaction
 from PIL import Image, ImageOps
 
 # Create your models here.
@@ -18,9 +19,43 @@ class Projeto(models.Model):
         return self.titulo
 
     def save(self, *args, **kwargs):
-        if self.capa and not self.capa._committed:
+        banco = kwargs.get('using') or router.db_for_write(type(self), instance=self)
+        campos_atualizados = kwargs.get('update_fields')
+        deve_salvar_capa = campos_atualizados is None or 'capa' in campos_atualizados
+        nova_capa = deve_salvar_capa and self.capa and not self.capa._committed
+        capa_anterior = None
+
+        if nova_capa and self.pk:
+            capa_anterior = (
+                type(self).objects.using(banco).filter(pk=self.pk)
+                .values_list('capa', flat=True)
+                .first()
+            )
+
+        if nova_capa:
             self.capa = self._converter_capa_para_webp(self.capa)
+
         super().save(*args, **kwargs)
+
+        if capa_anterior and capa_anterior != self.capa.name:
+            modelo = type(self)
+            armazenamento = self.capa.storage
+            transaction.on_commit(
+                lambda: modelo._excluir_capa_sem_uso(
+                    capa_anterior,
+                    armazenamento,
+                    banco,
+                ),
+                using=banco,
+            )
+
+    @classmethod
+    def _excluir_capa_sem_uso(cls, nome, armazenamento, banco):
+        capa_padrao = cls._meta.get_field('capa').default
+        ainda_esta_em_uso = cls.objects.using(banco).filter(capa=nome).exists()
+
+        if nome != capa_padrao and not ainda_esta_em_uso:
+            armazenamento.delete(nome)
 
     @staticmethod
     def _converter_capa_para_webp(capa):
@@ -28,6 +63,11 @@ class Projeto(models.Model):
         conteudo = BytesIO()
 
         with Image.open(capa) as imagem:
+            if imagem.format not in ('PNG', 'JPEG', 'WEBP'):
+                raise ValidationError(
+                    'Formato inválido. Envie uma imagem PNG, JPEG ou WebP.'
+                )
+
             imagem = ImageOps.exif_transpose(imagem)
             possui_transparencia = (
                 imagem.mode in ('RGBA', 'LA')

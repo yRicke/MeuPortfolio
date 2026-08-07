@@ -1,0 +1,35 @@
+<div class="field capa-upload" data-capa-upload>
+    <label for="capa">{{ rotulo }}</label>
+    <input
+        class="capa-input"
+        type="file"
+        name="capa"
+        id="capa"
+        accept=".png,.jpg,.jpeg,.webp,image/png,image/jpeg,image/webp"
+        {% if obrigatoria %}required{% endif %}
+        data-capa-input
+    >
+    <label class="capa-dropzone" for="capa" data-capa-dropzone>
+        <span class="capa-dropzone-icon" aria-hidden="true">&#8593;</span>
+        <span class="capa-dropzone-title" data-capa-dropzone-title>
+            Arraste a imagem aqui ou clique para selecionar
+        </span>
+        <span class="capa-dropzone-help">PNG, JPEG ou WebP</span>
+    </label>
+    <p class="capa-upload-error" data-capa-error role="alert" hidden></p>
+
+    <div
+        class="capa-preview{% if not capa_url %} is-hidden{% endif %}"
+        data-capa-preview
+        {% if capa_url %}data-capa-original="{{ capa_url }}"{% endif %}
+    >
+        <p class="chip" data-capa-status>
+            {% if capa_url %}Capa atual{% else %}Nova capa{% endif %}
+        </p>
+        <img
+            data-capa-preview-img
+            {% if capa_url %}src="{{ capa_url }}"{% endif %}
+            alt="Pré-visualização da capa"
+        >
+    </div>
+</div>
