@@ -875,7 +875,25 @@ button {
   background:
     linear-gradient(rgba(23, 14, 31, 0.52), rgba(23, 14, 31, 0.86)),
     url("../images/logo-hv-grafite.webp") center / 86% auto no-repeat;
+  color: inherit;
   clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
+  transition: border-color 0.35s ease, transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.projects-end:hover,
+.projects-end:focus-visible {
+  border-color: rgba(255, 255, 255, 0.72);
+  transform: translateY(-8px);
+}
+
+.projects-end:focus-visible {
+  outline: 2px solid var(--primary-strong);
+  outline-offset: 6px;
+}
+
+.projects-end:hover i,
+.projects-end:focus-visible i {
+  transform: translate(5px, 5px);
 }
 
 .projects-end span {
@@ -897,6 +915,7 @@ button {
   width: 42px;
   height: 42px;
   font-style: normal;
+  transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .projects-end i svg {

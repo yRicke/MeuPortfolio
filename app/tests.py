@@ -147,6 +147,14 @@ class PortfolioViewTest(TestCase):
         self.assertContains(resposta, 'about-hv-bg-mobile.webp')
         self.assertContains(resposta, 'favicon.ico')
         self.assertContains(resposta, 'projects-end-arrow')
+        self.assertContains(
+            resposta,
+            'mailto:henriquevieiraperes@gmail.com?subject=Novo%20projeto',
+        )
+        self.assertContains(
+            resposta,
+            'Entrar em contato para criar o próximo projeto',
+        )
         self.assertContains(resposta, 'cover-art-link')
         self.assertContains(
             resposta,
