@@ -217,6 +217,7 @@ class PortfolioViewTest(TestCase):
         self.assertContains(resposta, 'about-backdrop')
         self.assertContains(resposta, 'about-hv-bg-mobile.webp')
         self.assertContains(resposta, 'favicon.ico')
+        self.assertContains(resposta, 'favicon.png', count=2)
         self.assertContains(resposta, 'projects-end-arrow')
         self.assertContains(
             resposta,
