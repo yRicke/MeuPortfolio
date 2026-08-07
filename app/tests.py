@@ -271,6 +271,7 @@ class PortfolioViewTest(TestCase):
 
         self.assertContains(resposta, 'data-project-carousel')
         self.assertContains(resposta, 'data-project-slide', count=2)
+        self.assertContains(resposta, 'project-detail-hero-chrome')
         self.assertContains(resposta, 'data-project-carousel-controls')
         self.assertContains(resposta, 'data-project-carousel-previous')
         self.assertContains(resposta, 'data-project-carousel-next')
@@ -279,6 +280,9 @@ class PortfolioViewTest(TestCase):
         self.assertNotContains(resposta, self.projeto.capa.url)
         self.assertNotContains(resposta, 'project-gallery')
         self.assertNotContains(resposta, 'project-detail-slide-label')
+        self.assertContains(resposta, 'project-detail-overview')
+        self.assertContains(resposta, 'project-detail-signature')
+        self.assertContains(resposta, 'project-detail-next-footer')
         self.assertContains(resposta, 'datetime="2025-08"')
         self.assertContains(resposta, 'Desenvolvido em')
 

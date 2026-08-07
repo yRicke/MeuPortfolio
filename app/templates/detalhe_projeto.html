@@ -10,6 +10,12 @@
         data-project-carousel
         aria-label="Imagens do projeto {{ projeto.titulo }}"
     >
+        <div class="project-detail-hero-chrome" aria-hidden="true">
+            <span>HV / CASE STUDY</span>
+            <i></i>
+            <span>{% if projeto.data_desenvolvimento %}{{ projeto.data_desenvolvimento|date:"Y" }}{% else %}{{ projeto.data_criacao|date:"Y" }}{% endif %}</span>
+        </div>
+
         <div class="project-detail-slider">
             <div class="project-detail-slide is-active" data-project-slide aria-hidden="false">
                 <div class="project-detail-media" data-image-frame>
@@ -26,12 +32,21 @@
                         <small>CASE / STUDY</small>
                     </div>
                     <div class="project-detail-shade"></div>
+                    <span class="project-detail-frame-lines" aria-hidden="true"></span>
                 </div>
                 <div class="project-detail-title">
-                    <p class="eyebrow">
-                        Projeto / {% if projeto.data_desenvolvimento %}{{ projeto.data_desenvolvimento|date:"Y" }}{% else %}{{ projeto.data_criacao|date:"Y" }}{% endif %}
-                    </p>
+                    <div class="project-detail-kicker">
+                        <p class="eyebrow">
+                            Projeto / {% if projeto.data_desenvolvimento %}{{ projeto.data_desenvolvimento|date:"Y" }}{% else %}{{ projeto.data_criacao|date:"Y" }}{% endif %}
+                        </p>
+                        {% if imagens_projeto %}
+                        <span>{{ imagens_projeto|length|stringformat:"02d" }} imagens selecionadas</span>
+                        {% endif %}
+                    </div>
                     <h1>{{ projeto.titulo }}</h1>
+                    {% if imagens_projeto|length > 1 %}
+                    <p class="project-detail-interaction-hint">Arraste ou use as setas para explorar</p>
+                    {% endif %}
                 </div>
             </div>
 
@@ -49,6 +64,7 @@
                         <small>PROJECT / IMAGE</small>
                     </div>
                     <div class="project-detail-shade"></div>
+                    <span class="project-detail-frame-lines" aria-hidden="true"></span>
                 </div>
             </div>
             {% endfor %}
@@ -75,32 +91,66 @@
         {% endif %}
     </header>
 
-    <div class="project-detail-body">
-        <div class="project-detail-copy" data-reveal>
-            <p>{{ projeto.descricao|linebreaksbr }}</p>
-            {% if projeto.data_desenvolvimento %}
-            <div class="project-development-date">
-                <span>Desenvolvido em</span>
-                <time datetime="{{ projeto.data_desenvolvimento|date:'Y-m' }}">
-                    {{ projeto.data_desenvolvimento|date:"F \d\e Y" }}
-                </time>
-            </div>
-            {% endif %}
-            <div class="project-detail-actions">
-                {% if projeto.url %}
-                <a class="button" href="{{ projeto.url }}" target="_blank" rel="noopener">Visitar projeto ↗</a>
+    <section class="project-detail-overview" aria-labelledby="project-overview-title">
+        <header class="project-detail-overview-heading" data-reveal>
+            <p class="eyebrow">Sobre / projeto</p>
+            <h2 id="project-overview-title">Visão geral.</h2>
+        </header>
+
+        <div class="project-detail-body">
+            <div class="project-detail-copy" data-reveal>
+                <p>{{ projeto.descricao|linebreaksbr }}</p>
+                {% if projeto.data_desenvolvimento %}
+                <div class="project-development-date">
+                    <span>Desenvolvido em</span>
+                    <time datetime="{{ projeto.data_desenvolvimento|date:'Y-m' }}">
+                        {{ projeto.data_desenvolvimento|date:"F \d\e Y" }}
+                    </time>
+                </div>
                 {% endif %}
-                <a class="ghost-button" href="{% url 'index' %}#projetos">Voltar aos projetos</a>
-                {% if user.is_authenticated %}
-                <a class="ghost-button" href="{% url 'editar_projeto' projeto.id %}">Editar projeto</a>
-                {% endif %}
+                <div class="project-detail-actions">
+                    {% if projeto.url %}
+                    <a class="button project-detail-primary-action" href="{{ projeto.url }}" target="_blank" rel="noopener">
+                        <span>Visitar projeto</span>
+                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                            <path d="M7 17 17 7M8 7h9v9"></path>
+                        </svg>
+                    </a>
+                    {% endif %}
+                    <a class="ghost-button" href="{% url 'index' %}#projetos">Voltar aos projetos</a>
+                    {% if user.is_authenticated %}
+                    <a class="ghost-button" href="{% url 'editar_projeto' projeto.id %}">Editar projeto</a>
+                    {% endif %}
+                </div>
             </div>
+
+            <aside class="project-detail-signature" data-reveal aria-hidden="true">
+                <span>HV</span>
+                <div>
+                    <small>Selected work</small>
+                    <small>Digital portfolio</small>
+                </div>
+                <i></i>
+            </aside>
         </div>
-    </div>
+    </section>
 
     <footer class="project-detail-next">
-        <span>Próximo capítulo</span>
-        <a href="{% url 'index' %}#sobre">Trabalhe comigo <i aria-hidden="true">↗</i></a>
+        <div class="project-detail-next-heading">
+            <p class="eyebrow">Fim do projeto / Próximo passo</p>
+            <span>Tem uma ideia em mente?</span>
+        </div>
+        <a href="{% url 'index' %}#sobre">
+            <span>Trabalhe comigo</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M5 19 19 5M8 5h11v11"></path>
+            </svg>
+        </a>
+        <div class="project-detail-next-footer">
+            <span>Henrique Vieira</span>
+            <span>Design &amp; desenvolvimento</span>
+            <span>{% now "Y" %}</span>
+        </div>
     </footer>
 </article>
 {% endblock %}

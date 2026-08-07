@@ -111,10 +111,16 @@ document.addEventListener('DOMContentLoaded', () => {
   if (detalhe && !movimentoReduzido) {
     const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
     timeline
+      .from('.project-detail-hero-chrome > *', {
+        y: -12,
+        autoAlpha: 0,
+        duration: 0.65,
+        stagger: 0.08,
+      })
       .from('.project-detail-slide.is-active .project-detail-media', {
         clipPath: 'inset(0 0 100% 0)',
         duration: 1.2,
-      })
+      }, '-=0.4')
       .from('.project-detail-slide.is-active .project-detail-media img', {
         scale: 1.16,
         duration: 1.5,
@@ -128,6 +134,29 @@ document.addEventListener('DOMContentLoaded', () => {
         autoAlpha: 0,
         duration: 0.6,
       }, '-=0.45');
+
+    gsap.to('.project-detail-slide.is-active .project-detail-media img', {
+      yPercent: 7,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.project-detail-hero',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: 0.9,
+      },
+    });
+
+    gsap.to('.project-detail-title', {
+      yPercent: 16,
+      autoAlpha: 0.18,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '.project-detail-hero',
+        start: 'top top',
+        end: 'bottom 35%',
+        scrub: 0.8,
+      },
+    });
   }
 
   window.addEventListener('load', () => ScrollTrigger.refresh());
