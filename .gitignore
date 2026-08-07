@@ -13,3 +13,5 @@ media/
 
 # system
 .DS_Store
+.vercel
+.env*

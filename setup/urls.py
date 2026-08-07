@@ -35,5 +35,10 @@ urlpatterns = [
     path('deletar_projeto/<int:projeto_id>/', views.deletar_projeto, name='deletar_projeto'),
 ]
 
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+if settings.DATABASE_URL:
+    urlpatterns += [
+        path('media/<path:caminho>', views.servir_midia, name='servir_midia'),
+    ]
+else:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

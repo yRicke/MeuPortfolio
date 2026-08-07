@@ -6,12 +6,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_POST
 
-from app.models import Projeto
+from app.models import ArquivoMidia, Projeto
 
 # Create your views here.
 
@@ -30,6 +30,17 @@ def index(request):
             projetos.filter(destaque=True).first() or projetos.first()
         ),
     })
+
+
+def servir_midia(request, caminho):
+    arquivo = get_object_or_404(ArquivoMidia, nome=caminho)
+    resposta = HttpResponse(
+        bytes(arquivo.conteudo),
+        content_type=arquivo.tipo_conteudo,
+    )
+    resposta['Cache-Control'] = 'public, max-age=31536000, immutable'
+    resposta['X-Content-Type-Options'] = 'nosniff'
+    return resposta
 
 
 @login_required(login_url='entrar')
@@ -108,8 +119,11 @@ def detalhe_projeto(request, projeto_id):
     })
 
 
-@login_required(login_url='index')
+@login_required(login_url='entrar')
 def adicionar_projeto(request):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     if request.method == 'POST':
         titulo = request.POST.get('titulo')
         descricao = request.POST.get('descricao')
@@ -139,8 +153,11 @@ def adicionar_projeto(request):
     return render(request, 'adicionar_projeto.html')
 
 
-@login_required(login_url='index')
+@login_required(login_url='entrar')
 def editar_projeto(request, projeto_id):
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
     projeto = get_object_or_404(
         Projeto.objects.prefetch_related('imagens'),
         id=projeto_id,
@@ -174,9 +191,13 @@ def editar_projeto(request, projeto_id):
             messages.error(request, 'Erro ao atualizar projeto.')
     return render(request, 'editar_projeto.html', {'projeto': projeto})
 
-@login_required(login_url='index')
+@login_required(login_url='entrar')
+@require_POST
 def deletar_projeto(request, projeto_id):
-    projeto = Projeto.objects.get(id=projeto_id)
+    if not request.user.is_superuser:
+        raise PermissionDenied
+
+    projeto = get_object_or_404(Projeto, id=projeto_id)
     try:
         projeto.deletar_projeto()
         messages.success(request, 'Projeto removido.')

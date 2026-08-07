@@ -14,6 +14,24 @@ from PIL import Image, ImageOps
 NAO_INFORMADO = object()
 
 
+class ArquivoMidia(models.Model):
+    nome = models.CharField(max_length=500, unique=True)
+    conteudo = models.BinaryField(editable=False)
+    tipo_conteudo = models.CharField(
+        max_length=255,
+        default='application/octet-stream',
+    )
+    data_criacao = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ('nome',)
+        verbose_name = 'arquivo de mídia'
+        verbose_name_plural = 'arquivos de mídia'
+
+    def __str__(self):
+        return self.nome
+
+
 class Projeto(models.Model):
     titulo = models.CharField(max_length=200)
     descricao = models.TextField()

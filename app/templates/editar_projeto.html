@@ -34,9 +34,18 @@
                 </div>
                 <div class="form-actions">
                     <button class="button" type="submit">Salvar alterações</button>
-                    <a class="ghost-button" href="{% url 'deletar_projeto' projeto.id %}">Excluir projeto</a>
+                    <button class="ghost-button" type="submit" form="excluir-projeto">
+                        Excluir projeto
+                    </button>
                     <a class="ghost-button" href="{% url 'index' %}">Voltar</a>
                 </div>
+            </form>
+            <form
+                id="excluir-projeto"
+                method="post"
+                action="{% url 'deletar_projeto' projeto.id %}"
+            >
+                {% csrf_token %}
             </form>
         </div>
     {% else %}

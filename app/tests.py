@@ -7,11 +7,46 @@ from tempfile import TemporaryDirectory
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import TestCase
+from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from PIL import Image
 
-from app.models import ImagemProjeto, Projeto
+from app.models import ArquivoMidia, ImagemProjeto, Projeto
+from app.storage import DatabaseStorage
+from app.views import servir_midia
+
+
+class DatabaseStorageTest(TestCase):
+    def setUp(self):
+        self.storage = DatabaseStorage()
+
+    def test_salva_abre_serve_e_exclui_arquivo(self):
+        nome = self.storage.save(
+            'projetos/galeria/teste.webp',
+            SimpleUploadedFile(
+                'teste.webp',
+                b'conteudo-webp',
+                content_type='image/webp',
+            ),
+        )
+
+        self.assertEqual(nome, 'projetos/galeria/teste.webp')
+        self.assertTrue(self.storage.exists(nome))
+        self.assertEqual(self.storage.size(nome), len(b'conteudo-webp'))
+        with self.storage.open(nome) as arquivo:
+            self.assertEqual(arquivo.read(), b'conteudo-webp')
+
+        resposta = servir_midia(
+            RequestFactory().get(self.storage.url(nome)),
+            nome,
+        )
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(resposta.content, b'conteudo-webp')
+        self.assertEqual(resposta['Content-Type'], 'image/webp')
+        self.assertIn('immutable', resposta['Cache-Control'])
+
+        self.storage.delete(nome)
+        self.assertFalse(ArquivoMidia.objects.filter(nome=nome).exists())
 
 
 class ConversaoDeCapaTest(TestCase):
@@ -318,6 +353,38 @@ class PainelProjetosTest(TestCase):
         self.assertContains(resposta, 'organizer-cover-shade', count=3)
         self.assertContains(resposta, self.projetos[0].capa.url)
         self.assertContains(resposta, 'Usar como destaque', count=3)
+
+    def test_rotas_de_edicao_exigem_superusuario(self):
+        self.client.force_login(self.usuario_comum)
+
+        self.assertEqual(
+            self.client.get(reverse('adicionar_projeto')).status_code,
+            403,
+        )
+        self.assertEqual(
+            self.client.get(
+                reverse('editar_projeto', args=[self.projetos[0].pk])
+            ).status_code,
+            403,
+        )
+        self.assertEqual(
+            self.client.post(
+                reverse('deletar_projeto', args=[self.projetos[0].pk])
+            ).status_code,
+            403,
+        )
+
+    def test_exclusao_aceita_somente_post(self):
+        self.client.force_login(self.superusuario)
+        url = reverse('deletar_projeto', args=[self.projetos[2].pk])
+
+        self.assertEqual(self.client.get(url).status_code, 405)
+        self.assertTrue(Projeto.objects.filter(pk=self.projetos[2].pk).exists())
+
+        resposta = self.client.post(url)
+
+        self.assertRedirects(resposta, reverse('index'))
+        self.assertFalse(Projeto.objects.filter(pk=self.projetos[2].pk).exists())
 
     def test_salva_ordem_e_projeto_em_destaque(self):
         self.client.force_login(self.superusuario)
