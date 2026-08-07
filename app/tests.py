@@ -216,7 +216,7 @@ class PortfolioViewTest(TestCase):
         self.assertContains(resposta, self.projeto.descricao)
         self.assertContains(resposta, self.projeto.url)
 
-    def test_pagina_exclusiva_exibe_galeria_infinita_e_data(self):
+    def test_pagina_exclusiva_exibe_carrossel_manual_no_cabecalho_e_data(self):
         self.projeto.data_desenvolvimento = date(2025, 8, 1)
         self.projeto.save(update_fields=('data_desenvolvimento',))
         ImagemProjeto.objects.create(
@@ -234,21 +234,24 @@ class PortfolioViewTest(TestCase):
             reverse('detalhe_projeto', args=[self.projeto.id]),
         )
 
-        self.assertContains(resposta, 'data-project-gallery')
-        self.assertContains(resposta, 'data-project-gallery-track')
-        self.assertContains(resposta, 'data-project-gallery-group', count=1)
-        self.assertContains(resposta, 'Header / capa', count=2)
-        self.assertContains(resposta, 'projetos/galeria/primeira.webp', count=2)
-        self.assertContains(resposta, 'projetos/galeria/segunda.webp', count=2)
+        self.assertContains(resposta, 'data-project-carousel')
+        self.assertContains(resposta, 'data-project-slide', count=3)
+        self.assertContains(resposta, 'data-project-carousel-controls')
+        self.assertContains(resposta, 'data-project-carousel-previous')
+        self.assertContains(resposta, 'data-project-carousel-next')
+        self.assertContains(resposta, 'projetos/galeria/primeira.webp', count=1)
+        self.assertContains(resposta, 'projetos/galeria/segunda.webp', count=1)
+        self.assertNotContains(resposta, 'project-gallery')
         self.assertContains(resposta, 'datetime="2025-08"')
         self.assertContains(resposta, 'Desenvolvido em')
 
-    def test_pagina_exclusiva_sem_imagens_nao_exibe_carrossel(self):
+    def test_pagina_exclusiva_sem_imagens_nao_exibe_controles(self):
         resposta = self.client.get(
             reverse('detalhe_projeto', args=[self.projeto.id]),
         )
 
-        self.assertNotContains(resposta, 'data-project-gallery')
+        self.assertContains(resposta, 'data-project-slide', count=1)
+        self.assertNotContains(resposta, 'data-project-carousel-controls')
 
     def test_pagina_exclusiva_retorna_404_para_projeto_inexistente(self):
         resposta = self.client.get(reverse('detalhe_projeto', args=[999]))

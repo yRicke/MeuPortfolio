@@ -26,6 +26,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  iniciarCarrosselProjeto({
+    movimentoReduzido,
+    motorAnimacao: window.gsap,
+  });
+
   const gsapDisponivel = window.gsap && window.ScrollTrigger && window.ScrollToPlugin;
   if (!gsapDisponivel) {
     return;
@@ -106,35 +111,104 @@ document.addEventListener('DOMContentLoaded', () => {
   if (detalhe && !movimentoReduzido) {
     const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
     timeline
-      .from('.project-detail-media', { clipPath: 'inset(0 0 100% 0)', duration: 1.2 })
-      .from('.project-detail-media img', { scale: 1.16, duration: 1.5 }, '<')
-      .from('.project-detail-title > *', { y: 45, autoAlpha: 0, stagger: 0.12 }, '-=0.7');
-  }
-
-  const galeria = document.querySelector('[data-project-gallery]');
-  const trilhoGaleria = galeria?.querySelector('[data-project-gallery-track]');
-  const grupoGaleria = galeria?.querySelector('[data-project-gallery-group]');
-
-  if (trilhoGaleria && grupoGaleria && !movimentoReduzido) {
-    const animacaoGaleria = gsap.to(trilhoGaleria, {
-      x: () => -grupoGaleria.offsetWidth,
-      duration: Math.max(20, grupoGaleria.scrollWidth / 65),
-      ease: 'none',
-      repeat: -1,
-      repeatRefresh: true,
-    });
-
-    const pausarGaleria = () => animacaoGaleria.pause();
-    const retomarGaleria = () => animacaoGaleria.resume();
-
-    galeria.addEventListener('pointerenter', pausarGaleria);
-    galeria.addEventListener('pointerleave', retomarGaleria);
-    galeria.addEventListener('focusin', pausarGaleria);
-    galeria.addEventListener('focusout', retomarGaleria);
+      .from('.project-detail-slide.is-active .project-detail-media', {
+        clipPath: 'inset(0 0 100% 0)',
+        duration: 1.2,
+      })
+      .from('.project-detail-slide.is-active .project-detail-media img', {
+        scale: 1.16,
+        duration: 1.5,
+      }, '<')
+      .from('.project-detail-title > *', {
+        y: 45,
+        autoAlpha: 0,
+        stagger: 0.12,
+      }, '-=0.7')
+      .from('.project-detail-carousel-controls', {
+        autoAlpha: 0,
+        duration: 0.6,
+      }, '-=0.45');
   }
 
   window.addEventListener('load', () => ScrollTrigger.refresh());
 });
+
+function iniciarCarrosselProjeto({ movimentoReduzido, motorAnimacao }) {
+  const carrossel = document.querySelector('[data-project-carousel]');
+  const slides = Array.from(carrossel?.querySelectorAll('[data-project-slide]') || []);
+  const anterior = carrossel?.querySelector('[data-project-carousel-previous]');
+  const proximo = carrossel?.querySelector('[data-project-carousel-next]');
+  const contador = carrossel?.querySelector('[data-project-carousel-current]');
+
+  if (!carrossel || slides.length < 2 || !anterior || !proximo) {
+    return;
+  }
+
+  let indiceAtual = 0;
+  let emTransicao = false;
+
+  const atualizarContador = () => {
+    if (contador) {
+      contador.textContent = String(indiceAtual + 1).padStart(2, '0');
+    }
+  };
+
+  const concluirTroca = (slideAtual, slideSeguinte) => {
+    slideAtual.classList.remove('is-active');
+    slideSeguinte.classList.add('is-active');
+    motorAnimacao?.set([slideAtual, slideSeguinte], { clearProps: 'all' });
+    emTransicao = false;
+  };
+
+  const navegar = (direcao) => {
+    if (emTransicao) {
+      return;
+    }
+
+    const proximoIndice = (indiceAtual + direcao + slides.length) % slides.length;
+    const slideAtual = slides[indiceAtual];
+    const slideSeguinte = slides[proximoIndice];
+
+    indiceAtual = proximoIndice;
+    atualizarContador();
+    slideAtual.setAttribute('aria-hidden', 'true');
+    slideSeguinte.setAttribute('aria-hidden', 'false');
+
+    if (movimentoReduzido || !motorAnimacao) {
+      concluirTroca(slideAtual, slideSeguinte);
+      return;
+    }
+
+    emTransicao = true;
+    slideSeguinte.classList.add('is-active');
+    motorAnimacao.set(slideSeguinte, {
+      xPercent: direcao * 100,
+      autoAlpha: 1,
+    });
+
+    motorAnimacao.timeline({
+      defaults: { duration: 0.9, ease: 'power4.out' },
+      onComplete: () => concluirTroca(slideAtual, slideSeguinte),
+    })
+      .to(slideAtual, {
+        xPercent: direcao * -18,
+        autoAlpha: 0,
+      })
+      .to(slideSeguinte, { xPercent: 0 }, '<');
+  };
+
+  anterior.addEventListener('click', () => navegar(-1));
+  proximo.addEventListener('click', () => navegar(1));
+  carrossel.addEventListener('keydown', (event) => {
+    if (event.key === 'ArrowLeft') {
+      event.preventDefault();
+      navegar(-1);
+    } else if (event.key === 'ArrowRight') {
+      event.preventDefault();
+      navegar(1);
+    }
+  });
+}
 
 function iniciarPortfolio({ movimentoReduzido }) {
   const capa = document.querySelector('.cover-section');
