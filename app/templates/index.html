@@ -47,11 +47,6 @@
                 </figcaption>
             </figure>
 
-            <div class="cover-facts" data-hero-item>
-                <div><span>Base</span><strong>Brasil</strong></div>
-                <div><span>Foco</span><strong>Web &amp; sistemas</strong></div>
-                <div><span>Status</span><strong>Disponível</strong></div>
-            </div>
         </div>
 
         <a class="scroll-cue" href="#projetos" data-anchor-link data-hero-item>
@@ -61,6 +56,7 @@
     </section>
 
     <section class="portfolio-section projects-section" id="projetos" data-section="projetos" data-horizontal-section>
+        <div class="section-curtain projects-curtain" data-section-curtain aria-hidden="true"></div>
         <div class="projects-pin">
             <header class="projects-heading">
                 <div>
@@ -128,6 +124,7 @@
     </section>
 
     <section class="portfolio-section about-section" id="sobre" data-section="sobre">
+        <div class="section-curtain about-curtain" data-section-curtain aria-hidden="true"></div>
         <div class="about-marquee" aria-hidden="true" data-about-marquee>
             SOBRE — SOBRE — SOBRE — SOBRE —
         </div>
@@ -152,12 +149,21 @@
                     </p>
                 </div>
 
-                <dl class="about-details" data-reveal>
-                    <div><dt>Atuação</dt><dd>Full-stack</dd></div>
-                    <div><dt>Ferramentas</dt><dd>Django / Java / APIs</dd></div>
-                    <div><dt>Localização</dt><dd>Brasil / remoto</dd></div>
-                    <div><dt>Disponibilidade</dt><dd>Novos projetos</dd></div>
-                </dl>
+                <div class="about-system" data-reveal data-about-system>
+                    <div
+                        class="about-system-graphic"
+                        role="img"
+                        aria-label="Processo que conecta estratégia, código e produto"
+                    >
+                        <div class="system-ring system-ring-outer" aria-hidden="true"></div>
+                        <div class="system-ring system-ring-inner" aria-hidden="true"></div>
+                        <strong aria-hidden="true">HV</strong>
+                        <span class="system-node system-node-one">01 / Estratégia</span>
+                        <span class="system-node system-node-two">02 / Código</span>
+                        <span class="system-node system-node-three">03 / Produto</span>
+                    </div>
+                    <p>Uma visão completa, da primeira decisão até a entrega.</p>
+                </div>
             </div>
 
             <div class="about-contact" data-reveal>

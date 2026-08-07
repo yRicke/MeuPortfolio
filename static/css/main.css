@@ -1,35 +1,21 @@
 :root {
-  --bg: #f7f3ff;
-  --bg-soft: #eee7f8;
-  --surface: #ffffff;
-  --ink: #1f1a2b;
-  --muted: #645d73;
-  --primary: #7f44cc;
-  --primary-strong: #6838c2;
-  --accent: #e3d7f5;
-  --border: rgba(31, 26, 43, 0.15);
-  --cover: #7a688f;
-  --projects: #ded4ec;
-  --night: #160f26;
-  --night-soft: #241936;
-  --white: #faf8ff;
-  --shadow: 0 28px 80px rgba(31, 16, 57, 0.16);
+  --bg: #eeeaf2;
+  --bg-soft: #e2dce8;
+  --surface: #f8f5fa;
+  --ink: #241f2d;
+  --muted: #675f70;
+  --primary: #735a89;
+  --primary-strong: #574267;
+  --accent: #cfc3d9;
+  --border: rgba(36, 31, 45, 0.16);
+  --cover: #5c5269;
+  --projects: #897c98;
+  --night: #251e2e;
+  --night-soft: #342a3e;
+  --white: #f8f5fa;
+  --shadow: 0 28px 80px rgba(35, 27, 44, 0.18);
   --radius: 18px;
   color-scheme: light;
-}
-
-[data-theme="dark"] {
-  --bg: #160f26;
-  --bg-soft: #21172f;
-  --surface: #251b35;
-  --ink: #f2edf8;
-  --muted: #bcb3c9;
-  --primary: #a778e6;
-  --primary-strong: #c19af2;
-  --accent: #3b2b52;
-  --border: rgba(242, 237, 248, 0.16);
-  --shadow: 0 28px 80px rgba(0, 0, 0, 0.36);
-  color-scheme: dark;
 }
 
 *,
@@ -50,8 +36,9 @@ body {
   overflow-x: hidden;
   background: var(--bg);
   color: var(--ink);
-  font-family: "Manrope", "Segoe UI", sans-serif;
-  line-height: 1.55;
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+  font-size: 1.08rem;
+  line-height: 1.45;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -100,20 +87,19 @@ button {
   z-index: 50;
   padding: 18px 0;
   color: var(--ink);
-  transition: padding 0.35s ease, color 0.35s ease, background 0.35s ease;
+  border-bottom: 1px solid transparent;
+  backdrop-filter: blur(0);
+  transition: border-color 0.8s ease, backdrop-filter 1.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .portfolio-page .site-nav,
-.project-detail-page .site-nav,
-.site-nav.is-scrolled {
+.project-detail-page .site-nav {
   color: #fff;
 }
 
 .site-nav.is-scrolled {
-  padding: 10px 0;
-  background: rgba(22, 15, 38, 0.74);
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(18px);
+  backdrop-filter: blur(24px);
 }
 
 .nav-shell {
@@ -202,31 +188,22 @@ button {
   opacity: 1;
 }
 
-.theme-toggle {
+.nav-contact {
   width: 38px;
   height: 38px;
-  padding: 0;
   display: grid;
   place-items: center;
   border: 1px solid currentColor;
   border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
+  font-size: 1rem;
+  transition: color 0.25s ease, background 0.25s ease, transform 0.25s ease;
 }
 
-.theme-toggle span {
-  width: 12px;
-  height: 12px;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  background: currentColor;
-  box-shadow: inset 6px 0 0 transparent;
-  transition: background 0.25s ease, box-shadow 0.25s ease;
-}
-
-[data-theme="dark"] .theme-toggle span {
-  background: transparent;
-  box-shadow: inset 5px -2px 0 currentColor;
+.nav-contact:hover,
+.nav-contact:focus-visible {
+  background: var(--white);
+  color: var(--cover);
+  transform: rotate(45deg);
 }
 
 .messages {
@@ -259,6 +236,23 @@ button {
 .portfolio-section {
   position: relative;
   min-height: 100svh;
+}
+
+.section-curtain {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  pointer-events: none;
+  transform: scaleY(0);
+  will-change: transform;
+}
+
+.projects-curtain {
+  background: var(--cover);
+}
+
+.about-curtain {
+  background: var(--projects);
 }
 
 .eyebrow {
@@ -336,7 +330,7 @@ button {
   padding: 110px 0 30px;
   display: grid;
   grid-template-columns: minmax(0, 1.05fr) minmax(340px, 0.72fr);
-  grid-template-rows: 1fr auto;
+  grid-template-rows: 1fr;
   align-items: center;
   gap: 18px clamp(32px, 6vw, 100px);
 }
@@ -349,11 +343,12 @@ button {
 
 .cover-title {
   margin: 20px 0 30px;
-  font-family: "Fraunces", Georgia, serif;
-  font-size: clamp(4.3rem, min(10.5vw, 17vh), 10.5rem);
-  font-weight: 500;
-  line-height: 0.76;
-  letter-spacing: -0.075em;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-size: clamp(5rem, min(13vw, 20vh), 12.5rem);
+  font-weight: 400;
+  line-height: 0.8;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
 }
 
 .cover-title span {
@@ -383,7 +378,7 @@ button {
 }
 
 .cover-edition {
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: 1.1rem;
 }
 
@@ -397,7 +392,7 @@ button {
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  border-radius: 160px 160px 14px 14px;
+  clip-path: polygon(0 0, calc(100% - 38px) 0, 100% 38px, 100% 100%, 38px 100%, 0 calc(100% - 38px));
   background: #463653;
   box-shadow: 0 35px 90px rgba(25, 15, 39, 0.34);
 }
@@ -444,32 +439,6 @@ button {
   font-weight: 600;
 }
 
-.cover-facts {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.28);
-}
-
-.cover-facts div {
-  padding-top: 13px;
-  display: flex;
-  justify-content: space-between;
-  gap: 14px;
-  font-size: 0.63rem;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-}
-
-.cover-facts span {
-  opacity: 0.58;
-}
-
-.cover-facts strong {
-  font-weight: 600;
-}
-
 .scroll-cue {
   position: absolute;
   z-index: 4;
@@ -512,7 +481,7 @@ button {
   height: 100svh;
   overflow: hidden;
   background: var(--projects);
-  color: #251d31;
+  color: var(--white);
 }
 
 .projects-pin {
@@ -538,16 +507,17 @@ button {
 
 .projects-heading h2 {
   margin: 4px 0 0;
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: clamp(2.6rem, 5vw, 5.3rem);
-  font-weight: 500;
-  line-height: 0.9;
-  letter-spacing: -0.055em;
+  font-weight: 400;
+  line-height: 0.86;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 .projects-heading sup {
   margin-left: 8px;
-  font-family: "Manrope", sans-serif;
+  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
   font-size: 0.65rem;
   letter-spacing: 0.1em;
   vertical-align: top;
@@ -601,6 +571,7 @@ button {
   aspect-ratio: 4 / 5;
   overflow: hidden;
   background: #b5a6ca;
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
 }
 
 .project-media img {
@@ -631,11 +602,12 @@ button {
 .project-overlay h3 {
   max-width: 90%;
   margin: 0;
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: clamp(2rem, 3vw, 3.65rem);
-  font-weight: 500;
-  line-height: 0.94;
-  letter-spacing: -0.045em;
+  font-weight: 400;
+  line-height: 0.9;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 .project-open {
@@ -671,7 +643,7 @@ button {
   grid-template-columns: auto 1fr auto;
   align-items: start;
   gap: 16px;
-  border-top: 1px solid rgba(37, 29, 49, 0.28);
+  border-top: 1px solid rgba(255, 255, 255, 0.32);
   font-size: 0.62rem;
   letter-spacing: 0.11em;
   text-transform: uppercase;
@@ -704,7 +676,8 @@ button {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  border: 1px solid rgba(37, 29, 49, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
 }
 
 .projects-end span {
@@ -714,7 +687,7 @@ button {
 }
 
 .projects-end strong {
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: clamp(2rem, 3.3vw, 4rem);
   font-weight: 500;
   line-height: 0.95;
@@ -733,14 +706,14 @@ button {
   bottom: 24px;
   left: 36px;
   height: 1px;
-  background: rgba(37, 29, 49, 0.2);
+  background: rgba(255, 255, 255, 0.22);
 }
 
 .projects-progress span {
   width: 100%;
   height: 100%;
   display: block;
-  background: #251d31;
+  background: var(--white);
   transform: scaleX(0);
   transform-origin: left;
 }
@@ -749,7 +722,7 @@ button {
   height: 100%;
   display: grid;
   place-items: center;
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: clamp(2rem, 5vw, 5rem);
 }
 
@@ -768,11 +741,11 @@ button {
   margin-left: -4vw;
   padding-top: 72px;
   color: transparent;
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: clamp(7rem, 18vw, 18rem);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 0.8;
-  letter-spacing: -0.07em;
+  letter-spacing: 0.01em;
   -webkit-text-stroke: 1px rgba(255, 255, 255, 0.16);
   white-space: nowrap;
 }
@@ -794,11 +767,12 @@ button {
 
 .about-heading h2 {
   margin: 0;
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: clamp(3.4rem, 7.4vw, 8rem);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 0.86;
-  letter-spacing: -0.06em;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 .about-content {
@@ -823,28 +797,120 @@ button {
   font-weight: 500;
 }
 
-.about-details {
-  margin: 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.24);
-}
-
-.about-details div {
-  padding: 15px 0;
+.about-system {
+  align-self: start;
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  justify-items: center;
   gap: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
-  font-size: 0.68rem;
-  letter-spacing: 0.09em;
+}
+
+.about-system-graphic {
+  position: relative;
+  width: min(100%, 430px);
+  aspect-ratio: 1;
+}
+
+.about-system-graphic::before,
+.about-system-graphic::after {
+  content: "";
+  position: absolute;
+  z-index: 2;
+  background: var(--white);
+}
+
+.about-system-graphic::before {
+  top: 50%;
+  right: 0;
+  left: 0;
+  height: 1px;
+  opacity: 0.22;
+}
+
+.about-system-graphic::after {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  opacity: 0.22;
+}
+
+.system-ring {
+  position: absolute;
+  z-index: 1;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  will-change: transform;
+}
+
+.system-ring::before {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -5px;
+  left: 50%;
+  border-radius: 50%;
+  background: var(--white);
+}
+
+.system-ring-outer {
+  inset: 5%;
+}
+
+.system-ring-inner {
+  inset: 25%;
+  border-style: dashed;
+  opacity: 0.62;
+}
+
+.about-system-graphic > strong {
+  position: absolute;
+  z-index: 3;
+  top: 50%;
+  left: 50%;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-size: clamp(4rem, 8vw, 7rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  transform: translate(-50%, -50%);
+}
+
+.system-node {
+  position: absolute;
+  z-index: 4;
+  padding: 5px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  background: var(--night);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.13em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
-.about-details dt {
-  opacity: 0.48;
+.system-node-one {
+  top: 7%;
+  left: 8%;
 }
 
-.about-details dd {
+.system-node-two {
+  top: 46%;
+  right: 0;
+}
+
+.system-node-three {
+  bottom: 8%;
+  left: 13%;
+}
+
+.about-system > p {
+  max-width: 320px;
   margin: 0;
+  color: rgba(250, 248, 255, 0.58);
+  font-size: 0.72rem;
+  letter-spacing: 0.13em;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .about-contact {
@@ -864,10 +930,11 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: clamp(3.3rem, 8.5vw, 9rem);
-  line-height: 0.9;
-  letter-spacing: -0.055em;
+  line-height: 0.86;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 .about-contact a span {
@@ -918,7 +985,7 @@ button {
 .image-fallback span {
   align-self: center;
   margin: auto;
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: clamp(4rem, 8vw, 8rem);
 }
 
@@ -970,11 +1037,12 @@ button {
 .project-detail-title h1 {
   max-width: 1050px;
   margin: 12px 0 0;
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: clamp(3.6rem, 9vw, 9.5rem);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 0.84;
-  letter-spacing: -0.065em;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 .project-detail-body {
@@ -1029,10 +1097,11 @@ button {
   margin-top: 30px;
   display: flex;
   justify-content: space-between;
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: clamp(3rem, 8vw, 8rem);
   line-height: 0.9;
-  letter-spacing: -0.055em;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 /* Páginas administrativas */
@@ -1044,11 +1113,12 @@ button {
 
 .section-title {
   margin: 0 0 24px;
-  font-family: "Fraunces", serif;
+  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
   font-size: clamp(2.4rem, 6vw, 5rem);
-  font-weight: 500;
+  font-weight: 400;
   line-height: 0.95;
-  letter-spacing: -0.045em;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
 }
 
 .form-card,
@@ -1275,10 +1345,6 @@ input[type="file"].capa-input {
 }
 
 @media (min-width: 769px) and (max-height: 650px) {
-  .cover-facts {
-    display: none;
-  }
-
   .cover-art {
     width: min(100%, 340px, calc((100svh - 170px) * 0.8));
   }
@@ -1298,7 +1364,7 @@ input[type="file"].capa-input {
   }
 
   .brand > span,
-  .theme-toggle {
+  .nav-contact {
     width: 34px;
     height: 34px;
   }
@@ -1316,7 +1382,7 @@ input[type="file"].capa-input {
     width: calc(100% - 36px);
     padding: 112px 0 34px;
     grid-template-columns: 1fr;
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
     align-content: start;
   }
 
@@ -1344,15 +1410,6 @@ input[type="file"].capa-input {
 
   .cover-art-frame {
     aspect-ratio: 4 / 4.7;
-  }
-
-  .cover-facts {
-    grid-template-columns: 1fr;
-    gap: 4px;
-  }
-
-  .cover-facts div:not(:first-child) {
-    display: none;
   }
 
   .scroll-cue {

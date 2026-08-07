@@ -1,16 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-  const raiz = document.documentElement;
   const nav = document.querySelector('[data-site-nav]');
-  const botaoTema = document.querySelector('[data-theme-toggle]');
   const movimentoReduzido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  const atualizarTema = () => {
-    const escuro = raiz.dataset.theme === 'dark';
-    raiz.dataset.theme = escuro ? 'light' : 'dark';
-    localStorage.setItem('theme', raiz.dataset.theme);
-  };
-
-  botaoTema?.addEventListener('click', atualizarTema);
 
   const atualizarNav = () => {
     nav?.classList.toggle('is-scrolled', window.scrollY > 24);
@@ -58,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
       event.preventDefault();
       history.replaceState(null, '', destinoUrl.hash);
       gsap.to(window, {
-        duration: movimentoReduzido ? 0 : 1.1,
+        duration: movimentoReduzido ? 0 : 1.35,
         scrollTo: { y: destino, offsetY: 0 },
         ease: 'power3.inOut',
         overwrite: 'auto',
@@ -113,6 +103,35 @@ function iniciarPortfolio({ movimentoReduzido }) {
   const viewport = document.querySelector('[data-projects-viewport]');
   const trilho = document.querySelector('[data-projects-track]');
   const progresso = document.querySelector('[data-project-progress]');
+
+  const animarCortina = (seletor) => {
+    const cortina = document.querySelector(seletor);
+    if (!cortina) {
+      return;
+    }
+
+    if (movimentoReduzido) {
+      gsap.set(cortina, { scaleY: 0 });
+      return;
+    }
+
+    gsap.fromTo(
+      cortina,
+      { scaleY: 1, transformOrigin: 'top' },
+      {
+        scaleY: 0,
+        transformOrigin: 'top',
+        ease: 'none',
+        scrollTrigger: {
+          trigger: cortina.parentElement,
+          start: 'top 92%',
+          end: 'top 18%',
+          scrub: 0.8,
+          invalidateOnRefresh: true,
+        },
+      },
+    );
+  };
 
   if (!movimentoReduzido) {
     const entrada = gsap.timeline({ defaults: { ease: 'power4.out' } });
@@ -171,6 +190,23 @@ function iniciarPortfolio({ movimentoReduzido }) {
         moverY((event.clientY / window.innerHeight - 0.5) * 18);
       });
     }
+  }
+
+  animarCortina('.projects-curtain');
+
+  if (!movimentoReduzido) {
+    gsap.from('.projects-heading > *', {
+      y: 36,
+      autoAlpha: 0,
+      duration: 0.9,
+      stagger: 0.1,
+      ease: 'power3.out',
+      scrollTrigger: {
+        trigger: secaoProjetos,
+        start: 'top 72%',
+        once: true,
+      },
+    });
   }
 
   if (secaoProjetos && viewport && trilho) {
@@ -243,6 +279,8 @@ function iniciarPortfolio({ movimentoReduzido }) {
     viewport.addEventListener('scroll', atualizarProgressoMovel, { passive: true });
   }
 
+  animarCortina('.about-curtain');
+
   if (!movimentoReduzido) {
     gsap.fromTo(
       '[data-about-marquee]',
@@ -258,6 +296,28 @@ function iniciarPortfolio({ movimentoReduzido }) {
         },
       },
     );
+
+    gsap.to('.system-ring-outer', {
+      rotate: 110,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '[data-about-system]',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 1.1,
+      },
+    });
+
+    gsap.to('.system-ring-inner', {
+      rotate: -145,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: '[data-about-system]',
+        start: 'top bottom',
+        end: 'bottom top',
+        scrub: 1.1,
+      },
+    });
   }
 
   document.querySelectorAll('[data-section]').forEach((secao) => {

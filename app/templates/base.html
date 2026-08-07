@@ -8,17 +8,8 @@
     <title>{% block title %}Henrique Vieira — Portfólio{% endblock %}</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Bebas+Neue&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
-    <script>
-        (function () {
-            const temaSalvo = localStorage.getItem('theme');
-            const temaDoSistema = window.matchMedia('(prefers-color-scheme: dark)').matches;
-            if (temaSalvo === 'dark' || (!temaSalvo && temaDoSistema)) {
-                document.documentElement.dataset.theme = 'dark';
-            }
-        })();
-    </script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollToPlugin.min.js" defer></script>

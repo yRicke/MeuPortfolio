@@ -138,6 +138,10 @@ class PortfolioViewTest(TestCase):
         self.assertEqual(resposta.status_code, 200)
         self.assertContains(resposta, 'data-horizontal-section')
         self.assertContains(resposta, 'data-project-card')
+        self.assertContains(resposta, 'data-section-curtain')
+        self.assertContains(resposta, 'data-about-system')
+        self.assertNotContains(resposta, 'data-theme-toggle')
+        self.assertNotContains(resposta, 'cover-facts')
         self.assertContains(
             resposta,
             reverse('detalhe_projeto', args=[self.projeto.id]),
