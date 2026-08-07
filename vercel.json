@@ -3,7 +3,7 @@
   "functions": {
     "api/index.py": {
       "maxDuration": 60,
-      "excludeFiles": "{.env*,.vercel/**,.agents/**,venv/**,db.sqlite3,media/**,staticfiles/**,app/tests.py,skills-lock.json}"
+      "excludeFiles": "{.env*,.agents/**,venv/**,db.sqlite3,media/**,staticfiles/**,app/tests.py,skills-lock.json}"
     }
   },
   "rewrites": [
