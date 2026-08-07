@@ -32,14 +32,25 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
+  document.documentElement.classList.add('has-gsap-scroll');
+
+  let tweenDeNavegacao = null;
+
+  const encontrarDestino = (url) => {
+    const mesmaPagina = url.origin === window.location.origin
+      && url.pathname === window.location.pathname;
+
+    if (!mesmaPagina || !url.hash) {
+      return null;
+    }
+
+    return document.getElementById(decodeURIComponent(url.hash.slice(1)));
+  };
 
   document.querySelectorAll('[data-anchor-link]').forEach((link) => {
     link.addEventListener('click', (event) => {
       const destinoUrl = new URL(link.href, window.location.href);
-      const mesmaPagina = destinoUrl.pathname === window.location.pathname;
-      const destino = mesmaPagina && destinoUrl.hash
-        ? document.querySelector(destinoUrl.hash)
-        : null;
+      const destino = encontrarDestino(destinoUrl);
 
       if (!destino) {
         return;
@@ -47,11 +58,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
       event.preventDefault();
       history.replaceState(null, '', destinoUrl.hash);
-      gsap.to(window, {
-        duration: movimentoReduzido ? 0 : 1.55,
+      tweenDeNavegacao?.kill();
+      tweenDeNavegacao = gsap.to(window, {
+        duration: movimentoReduzido ? 0 : 1.4,
         scrollTo: { y: destino, offsetY: 0 },
         ease: 'power4.out',
-        overwrite: 'auto',
+        overwrite: true,
+        onComplete: () => {
+          tweenDeNavegacao = null;
+        },
+        onInterrupt: () => {
+          tweenDeNavegacao = null;
+        },
       });
     });
   });

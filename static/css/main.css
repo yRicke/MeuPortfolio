@@ -29,6 +29,10 @@ html {
   scroll-padding-top: 80px;
 }
 
+html.has-gsap-scroll {
+  scroll-behavior: auto;
+}
+
 body {
   margin: 0;
   min-width: 320px;
