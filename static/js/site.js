@@ -146,6 +146,13 @@ function iniciarCarrosselProjeto({ movimentoReduzido, motorAnimacao }) {
 
   let indiceAtual = 0;
   let emTransicao = false;
+  let ponteiroAtivo = null;
+  let origemX = 0;
+  let origemY = 0;
+  let deslocamentoX = 0;
+  let arrasteHorizontal = false;
+
+  carrossel.classList.add('is-draggable');
 
   const atualizarContador = () => {
     if (contador) {
@@ -207,6 +214,93 @@ function iniciarCarrosselProjeto({ movimentoReduzido, motorAnimacao }) {
       event.preventDefault();
       navegar(1);
     }
+  });
+
+  carrossel.addEventListener('dragstart', (event) => event.preventDefault());
+  carrossel.addEventListener('pointerdown', (event) => {
+    const iniciouEmControle = event.target.closest('button, a');
+    const botaoInvalido = event.pointerType === 'mouse' && event.button !== 0;
+
+    if (emTransicao || iniciouEmControle || botaoInvalido) {
+      return;
+    }
+
+    ponteiroAtivo = event.pointerId;
+    origemX = event.clientX;
+    origemY = event.clientY;
+    deslocamentoX = 0;
+    arrasteHorizontal = false;
+  });
+
+  carrossel.addEventListener('pointermove', (event) => {
+    if (event.pointerId !== ponteiroAtivo) {
+      return;
+    }
+
+    const distanciaX = event.clientX - origemX;
+    const distanciaY = event.clientY - origemY;
+
+    if (!arrasteHorizontal) {
+      if (Math.abs(distanciaX) < 10 && Math.abs(distanciaY) < 10) {
+        return;
+      }
+
+      if (Math.abs(distanciaY) >= Math.abs(distanciaX)) {
+        ponteiroAtivo = null;
+        return;
+      }
+
+      arrasteHorizontal = true;
+      carrossel.classList.add('is-dragging');
+      carrossel.setPointerCapture(event.pointerId);
+    }
+
+    event.preventDefault();
+    deslocamentoX = distanciaX;
+    motorAnimacao?.set(slides[indiceAtual], {
+      x: deslocamentoX * 0.22,
+    });
+  });
+
+  const finalizarArraste = (event, permitirNavegacao) => {
+    if (event.pointerId !== ponteiroAtivo) {
+      return;
+    }
+
+    const slideAtual = slides[indiceAtual];
+    const limite = Math.min(90, carrossel.clientWidth * 0.14);
+    const deveNavegar = (
+      permitirNavegacao
+      && arrasteHorizontal
+      && Math.abs(deslocamentoX) >= limite
+    );
+
+    if (carrossel.hasPointerCapture(event.pointerId)) {
+      carrossel.releasePointerCapture(event.pointerId);
+    }
+
+    carrossel.classList.remove('is-dragging');
+    ponteiroAtivo = null;
+    arrasteHorizontal = false;
+
+    if (deveNavegar) {
+      navegar(deslocamentoX < 0 ? 1 : -1);
+    } else {
+      motorAnimacao?.to(slideAtual, {
+        x: 0,
+        duration: movimentoReduzido ? 0 : 0.35,
+        ease: 'power3.out',
+      });
+    }
+
+    deslocamentoX = 0;
+  };
+
+  carrossel.addEventListener('pointerup', (event) => {
+    finalizarArraste(event, true);
+  });
+  carrossel.addEventListener('pointercancel', (event) => {
+    finalizarArraste(event, false);
   });
 }
 

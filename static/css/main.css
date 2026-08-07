@@ -101,6 +101,11 @@ button {
   color: #fff;
 }
 
+.project-detail-page .site-nav {
+  background: rgba(17, 13, 22, 0.88);
+  mix-blend-mode: normal;
+}
+
 .site-nav.is-scrolled {
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(24px);
@@ -1164,6 +1169,16 @@ button {
   overflow: hidden;
   background: #5f4d73;
   color: #fff;
+}
+
+.project-detail-hero.is-draggable {
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.project-detail-hero.is-dragging {
+  cursor: grabbing;
 }
 
 .project-detail-slider,
