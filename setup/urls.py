@@ -28,6 +28,7 @@ urlpatterns = [
     path('entrar/', views.entrar, name='entrar'),
     path('sair/', views.sair, name='sair'),
 
+    path('painel/projetos/', views.painel_projetos, name='painel_projetos'),
     path('adicionar_projeto/', views.adicionar_projeto, name='adicionar_projeto'),
     path('projeto/<int:projeto_id>/', views.detalhe_projeto, name='detalhe_projeto'),
     path('editar_projeto/<int:projeto_id>/', views.editar_projeto, name='editar_projeto'),

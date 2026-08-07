@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Organizar projetos — Portfólio{% endblock %}
+{% block body_class %}organizer-page{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/organizador-projetos.js' %}" defer></script>
+{% endblock %}
+
+{% block content %}
+<section class="organizer-section">
+    <header class="organizer-header">
+        <div>
+            <p class="eyebrow">Painel administrativo / projetos</p>
+            <h1>Organize seu<br>portfólio.</h1>
+        </div>
+        <div class="organizer-intro">
+            <p>
+                Arraste os projetos pela alça para definir a ordem em que aparecem
+                no site e escolha qual deles ocupa o destaque da capa.
+            </p>
+            <span>{{ projetos|length|stringformat:"02d" }} projetos cadastrados</span>
+        </div>
+    </header>
+
+    {% if projetos %}
+    <form
+        class="organizer-board"
+        action="{% url 'painel_projetos' %}"
+        method="post"
+        data-organizer-form
+    >
+        {% csrf_token %}
+        <div class="organizer-toolbar">
+            <p data-organizer-status role="status" aria-live="polite">
+                A organização está atualizada.
+            </p>
+            <button class="button organizer-save" type="submit" data-organizer-save disabled>
+                Salvar organização
+            </button>
+        </div>
+
+        <ol class="organizer-list" data-project-list>
+            {% for projeto in projetos %}
+            <li
+                class="organizer-item{% if projeto.destaque %} is-featured{% endif %}"
+                data-project-id="{{ projeto.id }}"
+            >
+                <button
+                    class="organizer-drag-handle"
+                    type="button"
+                    draggable="true"
+                    aria-label="Arrastar {{ projeto.titulo }} para mudar sua posição"
+                    title="Arraste para reordenar"
+                >
+                    <span aria-hidden="true"></span>
+                </button>
+
+                <span class="organizer-position" data-order-number>
+                    {{ forloop.counter|stringformat:"02d" }}
+                </span>
+
+                <div class="organizer-cover" data-image-frame>
+                    {% if projeto.capa %}
+                    <img
+                        src="{{ projeto.capa.url }}"
+                        alt=""
+                        loading="lazy"
+                        data-project-image
+                    >
+                    {% endif %}
+                    <div class="image-fallback" aria-hidden="true">
+                        <span>HV</span>
+                    </div>
+                </div>
+
+                <div class="organizer-project-copy">
+                    <span>Projeto / {{ projeto.data_criacao|date:"Y" }}</span>
+                    <strong>{{ projeto.titulo }}</strong>
+                </div>
+
+                <label class="organizer-featured-control">
+                    <input
+                        type="radio"
+                        name="destaque"
+                        value="{{ projeto.id }}"
+                        {% if projeto.destaque %}checked{% endif %}
+                    >
+                    <span>Usar como destaque</span>
+                </label>
+
+                <div class="organizer-actions">
+                    <div class="organizer-move-buttons" aria-label="Alterar posição de {{ projeto.titulo }}">
+                        <button type="button" data-move="up" aria-label="Mover {{ projeto.titulo }} para cima">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M12 19V5M6 11l6-6 6 6"></path>
+                            </svg>
+                        </button>
+                        <button type="button" data-move="down" aria-label="Mover {{ projeto.titulo }} para baixo">
+                            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                                <path d="M12 5v14M6 13l6 6 6-6"></path>
+                            </svg>
+                        </button>
+                    </div>
+                    <a href="{% url 'editar_projeto' projeto.id %}">Editar</a>
+                </div>
+            </li>
+            {% endfor %}
+        </ol>
+    </form>
+    {% else %}
+    <div class="organizer-empty">
+        <span>00</span>
+        <h2>Ainda não há projetos para organizar.</h2>
+        <a class="button" href="{% url 'adicionar_projeto' %}">Adicionar primeiro projeto</a>
+    </div>
+    {% endif %}
+</section>
+{% endblock %}

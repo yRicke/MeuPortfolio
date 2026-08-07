@@ -15,6 +15,9 @@
         </div>
 
         <div class="nav-tools">
+            {% if user.is_superuser %}
+            <a class="nav-admin" href="{% url 'painel_projetos' %}">Organizar</a>
+            {% endif %}
             {% if user.is_authenticated %}
             <a class="nav-admin" href="{% url 'adicionar_projeto' %}">+ Projeto</a>
             <a class="nav-admin" href="{% url 'sair' %}">Sair</a>

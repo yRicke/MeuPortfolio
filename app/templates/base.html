@@ -16,6 +16,7 @@
     <script src="https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollToPlugin.min.js" defer></script>
     <script src="{% static 'js/site.js' %}" defer></script>
     <script src="{% static 'js/capa-dropzone.js' %}" defer></script>
+    {% block extra_scripts %}{% endblock %}
 </head>
 <body class="{% block body_class %}{% endblock %}">
     <div class="page-transition" data-page-transition aria-hidden="true"></div>

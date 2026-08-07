@@ -1,7 +1,9 @@
+import json
 from io import BytesIO
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
+from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import TestCase
@@ -178,3 +180,119 @@ class PortfolioViewTest(TestCase):
             f'{reverse("index")}#sobre',
             fetch_redirect_response=False,
         )
+
+
+class PainelProjetosTest(TestCase):
+    def setUp(self):
+        usuario = get_user_model()
+        self.superusuario = usuario.objects.create_superuser(
+            username='administrador',
+            password='senha-segura',
+        )
+        self.usuario_comum = usuario.objects.create_user(
+            username='editor',
+            password='senha-segura',
+        )
+        self.projetos = [
+            Projeto.objects.create(
+                titulo=f'Projeto {indice}',
+                descricao='Descrição',
+                capa=f'projetos/capas/projeto-{indice}.webp',
+                ordem=indice - 1,
+                destaque=indice == 1,
+            )
+            for indice in range(1, 4)
+        ]
+
+    def test_painel_exige_superusuario(self):
+        resposta_anonima = self.client.get(reverse('painel_projetos'))
+
+        self.assertRedirects(
+            resposta_anonima,
+            f'{reverse("entrar")}?next={reverse("painel_projetos")}',
+            fetch_redirect_response=False,
+        )
+
+        self.client.force_login(self.usuario_comum)
+        resposta_sem_permissao = self.client.get(reverse('painel_projetos'))
+
+        self.assertEqual(resposta_sem_permissao.status_code, 403)
+
+    def test_painel_exibe_organizador_para_superusuario(self):
+        self.client.force_login(self.superusuario)
+        resposta = self.client.get(reverse('painel_projetos'))
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertContains(resposta, 'data-organizer-form')
+        self.assertContains(resposta, 'data-project-list')
+        self.assertContains(resposta, 'organizador-projetos.js')
+        self.assertContains(resposta, 'Usar como destaque', count=3)
+
+    def test_salva_ordem_e_projeto_em_destaque(self):
+        self.client.force_login(self.superusuario)
+        nova_ordem = [
+            self.projetos[2].pk,
+            self.projetos[0].pk,
+            self.projetos[1].pk,
+        ]
+
+        resposta = self.client.post(
+            reverse('painel_projetos'),
+            data=json.dumps({
+                'ordem': nova_ordem,
+                'destaque': self.projetos[1].pk,
+            }),
+            content_type='application/json',
+        )
+
+        self.assertEqual(resposta.status_code, 200)
+        self.assertEqual(
+            list(Projeto.objects.values_list('pk', flat=True)),
+            nova_ordem,
+        )
+        self.assertEqual(
+            Projeto.objects.get(destaque=True),
+            self.projetos[1],
+        )
+
+        pagina_publica = self.client.get(reverse('index'))
+        self.assertEqual(
+            pagina_publica.context['projeto_destaque'],
+            self.projetos[1],
+        )
+
+    def test_recusa_lista_incompleta_sem_alterar_organizacao(self):
+        self.client.force_login(self.superusuario)
+        ordem_original = list(Projeto.objects.values_list('pk', flat=True))
+
+        resposta = self.client.post(
+            reverse('painel_projetos'),
+            data=json.dumps({
+                'ordem': ordem_original[:-1],
+                'destaque': self.projetos[0].pk,
+            }),
+            content_type='application/json',
+        )
+
+        self.assertEqual(resposta.status_code, 400)
+        self.assertEqual(
+            list(Projeto.objects.values_list('pk', flat=True)),
+            ordem_original,
+        )
+        self.assertEqual(Projeto.objects.get(destaque=True), self.projetos[0])
+
+    def test_novo_projeto_entra_no_final_da_ordem(self):
+        novo_projeto = Projeto.criar_projeto(
+            titulo='Projeto novo',
+            descricao='Descrição',
+            capa='projetos/capas/projeto-novo.webp',
+        )
+
+        self.assertEqual(novo_projeto.ordem, 3)
+        self.assertFalse(novo_projeto.destaque)
+
+    def test_excluir_destaque_promove_primeiro_projeto_restante(self):
+        self.projetos[0].deletar_projeto()
+        self.projetos[1].refresh_from_db()
+
+        self.assertTrue(self.projetos[1].destaque)
