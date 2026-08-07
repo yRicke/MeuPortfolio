@@ -1,7 +1,10 @@
+{% load static %}
 <nav class="site-nav" data-site-nav aria-label="Navegação principal">
     <div class="nav-shell">
         <a class="brand" href="{% url 'index' %}#inicio" data-anchor-link>
-            <span>HV</span>
+            <span class="brand-mark" aria-hidden="true">
+                <img src="{% static 'images/logo-hv.webp' %}" alt="">
+            </span>
             <small>Henrique Vieira</small>
         </a>
 

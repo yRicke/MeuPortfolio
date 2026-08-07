@@ -120,15 +120,16 @@ button {
   letter-spacing: 0.09em;
 }
 
-.brand > span {
-  width: 38px;
-  height: 38px;
-  display: grid;
-  place-items: center;
-  border: 1px solid currentColor;
-  border-radius: 50%;
-  font-size: 0.7rem;
-  font-weight: 700;
+.brand-mark {
+  width: 44px;
+  height: 44px;
+  display: block;
+}
+
+.brand-mark img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .brand small {
@@ -340,6 +341,22 @@ button {
   align-self: center;
   position: relative;
   z-index: 3;
+  isolation: isolate;
+}
+
+.cover-logo-watermark {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: -12%;
+  width: clamp(430px, 54vw, 820px);
+  max-width: none;
+  opacity: 0.18;
+  pointer-events: none;
+  filter: drop-shadow(0 0 34px rgba(178, 139, 200, 0.26));
+  mix-blend-mode: screen;
+  transform: translateY(-50%) rotate(-4deg);
+  transform-origin: center;
 }
 
 .cover-title {
@@ -733,7 +750,7 @@ button {
   overflow: hidden;
   background:
     linear-gradient(90deg, rgba(12, 9, 16, 0.95) 0%, rgba(18, 13, 23, 0.78) 52%, rgba(20, 14, 27, 0.42) 100%),
-    url("../images/portfolio-about-bg.webp") center / cover no-repeat,
+    url("../images/about-hv-bg.webp") center top / auto 100svh no-repeat,
     var(--night);
   color: var(--white);
 }
@@ -1248,10 +1265,10 @@ input[type="file"].capa-input {
     display: none;
   }
 
-  .brand > span,
+  .brand-mark,
   .nav-contact {
-    width: 34px;
-    height: 34px;
+    width: 38px;
+    height: 38px;
   }
 
   .nav-links {
@@ -1278,6 +1295,14 @@ input[type="file"].capa-input {
 
   .cover-title span:last-child {
     margin-left: 9vw;
+  }
+
+  .cover-logo-watermark {
+    top: 45%;
+    left: -26vw;
+    width: min(140vw, 600px);
+    opacity: 0.15;
+    transform: translateY(-50%) rotate(-6deg);
   }
 
   .cover-summary {
@@ -1352,6 +1377,13 @@ input[type="file"].capa-input {
   .about-marquee {
     padding-top: 90px;
     font-size: 34vw;
+  }
+
+  .about-section {
+    background:
+      linear-gradient(180deg, rgba(12, 9, 16, 0.9) 0%, rgba(18, 13, 23, 0.58) 52%, rgba(12, 9, 16, 0.78) 100%),
+      url("../images/about-hv-bg-mobile.webp") center top / auto 100svh no-repeat,
+      var(--night);
   }
 
   .about-shell {

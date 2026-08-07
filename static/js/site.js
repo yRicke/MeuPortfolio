@@ -136,12 +136,18 @@ function iniciarPortfolio({ movimentoReduzido }) {
   if (!movimentoReduzido) {
     const entrada = gsap.timeline({ defaults: { ease: 'power4.out' } });
     entrada
+      .from('[data-hero-logo]', {
+        scale: 0.82,
+        rotate: -10,
+        autoAlpha: 0,
+        duration: 1.5,
+      }, 0)
       .from('[data-hero-line]', {
         yPercent: 115,
         rotate: 3,
         duration: 1.25,
         stagger: 0.1,
-      })
+      }, 0.08)
       .from('[data-cover-art]', {
         clipPath: 'inset(100% 0 0 0)',
         duration: 1.35,
