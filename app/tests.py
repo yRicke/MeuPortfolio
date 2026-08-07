@@ -242,6 +242,7 @@ class PortfolioViewTest(TestCase):
         self.assertContains(resposta, 'projetos/galeria/primeira.webp', count=1)
         self.assertContains(resposta, 'projetos/galeria/segunda.webp', count=1)
         self.assertNotContains(resposta, 'project-gallery')
+        self.assertNotContains(resposta, 'project-detail-slide-label')
         self.assertContains(resposta, 'datetime="2025-08"')
         self.assertContains(resposta, 'Desenvolvido em')
 

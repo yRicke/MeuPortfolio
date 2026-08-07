@@ -1213,25 +1213,6 @@ button {
   text-transform: uppercase;
 }
 
-.project-detail-slide-label {
-  position: absolute;
-  z-index: 3;
-  right: max(36px, calc((100vw - 1440px) / 2 + 36px));
-  bottom: 8vh;
-  left: max(36px, calc((100vw - 1440px) / 2 + 36px));
-  pointer-events: none;
-}
-
-.project-detail-slide-label > span {
-  display: inline-block;
-  max-width: min(680px, 70vw);
-  margin-top: 10px;
-  font-family: "Anton", "Impact", sans-serif;
-  font-size: clamp(2rem, 5vw, 5rem);
-  line-height: 0.94;
-  text-transform: uppercase;
-}
-
 .project-detail-carousel-controls {
   position: absolute;
   z-index: 5;
@@ -1329,7 +1310,7 @@ button {
 
 .project-development-date time {
   font-family: "Anton", "Impact", sans-serif;
-  font-size: clamp(1.8rem, 4vw, 3.5rem);
+  font-size: clamp(1.6rem, 2.4vw, 2.5rem);
   line-height: 1;
 }
 
@@ -2270,19 +2251,8 @@ input[type="file"].capa-input {
     left: 18px;
   }
 
-  .project-detail-slide-label {
-    right: 18px;
-    bottom: 7vh;
-    left: 18px;
-  }
-
   .project-detail-title h1 {
     font-size: clamp(3rem, 15vw, 6rem);
-  }
-
-  .project-detail-slide-label > span {
-    max-width: calc(100vw - 36px);
-    font-size: clamp(2rem, 11vw, 4.2rem);
   }
 
   .project-detail-carousel-controls {
@@ -2306,6 +2276,10 @@ input[type="file"].capa-input {
     align-items: flex-start;
     flex-direction: column;
     gap: 12px;
+  }
+
+  .project-development-date time {
+    font-size: 1.8rem;
   }
 
   .project-detail-next {
