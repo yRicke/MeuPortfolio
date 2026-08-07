@@ -13,8 +13,13 @@
         <div class="project-detail-slider">
             <div class="project-detail-slide is-active" data-project-slide aria-hidden="false">
                 <div class="project-detail-media" data-image-frame>
-                    {% if projeto.capa %}
-                    <img src="{{ projeto.capa.url }}" alt="Capa de {{ projeto.titulo }}" data-project-image>
+                    {% if imagens_projeto %}
+                    <img
+                        src="{{ imagens_projeto.0.imagem.url }}"
+                        alt="Imagem principal do projeto {{ projeto.titulo }}"
+                        fetchpriority="high"
+                        data-project-image
+                    >
                     {% endif %}
                     <div class="image-fallback" aria-hidden="true">
                         <span>HV</span>
@@ -30,12 +35,12 @@
                 </div>
             </div>
 
-            {% for item in imagens_projeto %}
+            {% for item in imagens_projeto|slice:"1:" %}
             <div class="project-detail-slide" data-project-slide aria-hidden="true">
                 <div class="project-detail-media" data-image-frame>
                     <img
                         src="{{ item.imagem.url }}"
-                        alt="Imagem {{ forloop.counter }} do projeto {{ projeto.titulo }}"
+                        alt="Imagem {{ forloop.counter|add:'1' }} do projeto {{ projeto.titulo }}"
                         loading="lazy"
                         data-project-image
                     >
@@ -49,7 +54,7 @@
             {% endfor %}
         </div>
 
-        {% if imagens_projeto %}
+        {% if imagens_projeto|length > 1 %}
         <div class="project-detail-carousel-controls" data-project-carousel-controls>
             <button type="button" data-project-carousel-previous aria-label="Mostrar imagem anterior">
                 <svg viewBox="0 0 24 24" aria-hidden="true">
@@ -59,7 +64,7 @@
             <p class="project-detail-carousel-status" aria-live="polite" aria-atomic="true">
                 <span data-project-carousel-current>01</span>
                 <i aria-hidden="true"></i>
-                <span>{{ imagens_projeto|length|add:"1"|stringformat:"02d" }}</span>
+                <span>{{ imagens_projeto|length|stringformat:"02d" }}</span>
             </p>
             <button type="button" data-project-carousel-next aria-label="Mostrar próxima imagem">
                 <svg viewBox="0 0 24 24" aria-hidden="true">

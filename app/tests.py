@@ -235,12 +235,13 @@ class PortfolioViewTest(TestCase):
         )
 
         self.assertContains(resposta, 'data-project-carousel')
-        self.assertContains(resposta, 'data-project-slide', count=3)
+        self.assertContains(resposta, 'data-project-slide', count=2)
         self.assertContains(resposta, 'data-project-carousel-controls')
         self.assertContains(resposta, 'data-project-carousel-previous')
         self.assertContains(resposta, 'data-project-carousel-next')
         self.assertContains(resposta, 'projetos/galeria/primeira.webp', count=1)
         self.assertContains(resposta, 'projetos/galeria/segunda.webp', count=1)
+        self.assertNotContains(resposta, self.projeto.capa.url)
         self.assertNotContains(resposta, 'project-gallery')
         self.assertNotContains(resposta, 'project-detail-slide-label')
         self.assertContains(resposta, 'datetime="2025-08"')
@@ -253,6 +254,7 @@ class PortfolioViewTest(TestCase):
 
         self.assertContains(resposta, 'data-project-slide', count=1)
         self.assertNotContains(resposta, 'data-project-carousel-controls')
+        self.assertNotContains(resposta, self.projeto.capa.url)
 
     def test_pagina_exclusiva_retorna_404_para_projeto_inexistente(self):
         resposta = self.client.get(reverse('detalhe_projeto', args=[999]))
