@@ -48,9 +48,9 @@ document.addEventListener('DOMContentLoaded', () => {
       event.preventDefault();
       history.replaceState(null, '', destinoUrl.hash);
       gsap.to(window, {
-        duration: movimentoReduzido ? 0 : 1.35,
+        duration: movimentoReduzido ? 0 : 1.55,
         scrollTo: { y: destino, offsetY: 0 },
-        ease: 'power3.inOut',
+        ease: 'power4.out',
         overwrite: 'auto',
       });
     });
