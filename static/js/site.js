@@ -296,28 +296,6 @@ function iniciarPortfolio({ movimentoReduzido }) {
         },
       },
     );
-
-    gsap.to('.system-ring-outer', {
-      rotate: 110,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '[data-about-system]',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 1.1,
-      },
-    });
-
-    gsap.to('.system-ring-inner', {
-      rotate: -145,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '[data-about-system]',
-        start: 'top bottom',
-        end: 'bottom top',
-        scrub: 1.1,
-      },
-    });
   }
 
   document.querySelectorAll('[data-section]').forEach((secao) => {

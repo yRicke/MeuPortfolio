@@ -1,21 +1,21 @@
 :root {
-  --bg: #eeeaf2;
-  --bg-soft: #e2dce8;
-  --surface: #f8f5fa;
-  --ink: #241f2d;
-  --muted: #675f70;
-  --primary: #735a89;
-  --primary-strong: #574267;
-  --accent: #cfc3d9;
-  --border: rgba(36, 31, 45, 0.16);
-  --cover: #5c5269;
-  --projects: #897c98;
-  --night: #251e2e;
-  --night-soft: #342a3e;
-  --white: #f8f5fa;
-  --shadow: 0 28px 80px rgba(35, 27, 44, 0.18);
+  --bg: #18131f;
+  --bg-soft: #211a2a;
+  --surface: #2a2134;
+  --ink: #f4eff7;
+  --muted: #bbb0c4;
+  --primary: #8a68a3;
+  --primary-strong: #b18bc8;
+  --accent: #3d304a;
+  --border: rgba(244, 239, 247, 0.16);
+  --cover: #201827;
+  --projects: #392b45;
+  --night: #110d16;
+  --night-soft: #211927;
+  --white: #f7f3fa;
+  --shadow: 0 28px 80px rgba(10, 7, 13, 0.34);
   --radius: 18px;
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 *,
@@ -36,13 +36,12 @@ body {
   overflow-x: hidden;
   background: var(--bg);
   color: var(--ink);
-  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
   font-size: 1.08rem;
   line-height: 1.45;
   -webkit-font-smoothing: antialiased;
 }
 
-body,
 button,
 input,
 textarea {
@@ -268,15 +267,16 @@ button {
   min-height: 100svh;
   overflow: hidden;
   background:
-    radial-gradient(circle at 75% 32%, rgba(224, 209, 244, 0.32), transparent 24%),
-    linear-gradient(135deg, #5f4d73 0%, var(--cover) 48%, #927da9 100%);
+    linear-gradient(90deg, rgba(17, 13, 22, 0.94) 0%, rgba(24, 17, 31, 0.8) 46%, rgba(29, 19, 38, 0.44) 100%),
+    url("../images/portfolio-hero-bg.webp") center / cover no-repeat,
+    var(--cover);
   color: var(--white);
 }
 
 .cover-grid {
   position: absolute;
   inset: 0;
-  opacity: 0.14;
+  opacity: 0.08;
   background-image:
     linear-gradient(rgba(255, 255, 255, 0.35) 1px, transparent 1px),
     linear-gradient(90deg, rgba(255, 255, 255, 0.35) 1px, transparent 1px);
@@ -343,7 +343,7 @@ button {
 
 .cover-title {
   margin: 20px 0 30px;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(5rem, min(13vw, 20vh), 12.5rem);
   font-weight: 400;
   line-height: 0.8;
@@ -378,7 +378,7 @@ button {
 }
 
 .cover-edition {
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: 1.1rem;
 }
 
@@ -507,7 +507,7 @@ button {
 
 .projects-heading h2 {
   margin: 4px 0 0;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(2.6rem, 5vw, 5.3rem);
   font-weight: 400;
   line-height: 0.86;
@@ -517,7 +517,7 @@ button {
 
 .projects-heading sup {
   margin-left: 8px;
-  font-family: "Barlow Condensed", "Arial Narrow", sans-serif;
+  font-family: "Roboto Condensed", "Arial Narrow", sans-serif;
   font-size: 0.65rem;
   letter-spacing: 0.1em;
   vertical-align: top;
@@ -570,7 +570,7 @@ button {
   position: relative;
   aspect-ratio: 4 / 5;
   overflow: hidden;
-  background: #b5a6ca;
+  background: #62506f;
   clip-path: polygon(0 0, calc(100% - 22px) 0, 100% 22px, 100% 100%, 22px 100%, 0 calc(100% - 22px));
 }
 
@@ -602,7 +602,7 @@ button {
 .project-overlay h3 {
   max-width: 90%;
   margin: 0;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(2rem, 3vw, 3.65rem);
   font-weight: 400;
   line-height: 0.9;
@@ -687,7 +687,7 @@ button {
 }
 
 .projects-end strong {
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(2rem, 3.3vw, 4rem);
   font-weight: 500;
   line-height: 0.95;
@@ -722,7 +722,7 @@ button {
   height: 100%;
   display: grid;
   place-items: center;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(2rem, 5vw, 5rem);
 }
 
@@ -731,7 +731,8 @@ button {
   min-height: 100svh;
   overflow: hidden;
   background:
-    radial-gradient(circle at 84% 18%, rgba(127, 68, 204, 0.24), transparent 26%),
+    linear-gradient(90deg, rgba(12, 9, 16, 0.95) 0%, rgba(18, 13, 23, 0.78) 52%, rgba(20, 14, 27, 0.42) 100%),
+    url("../images/portfolio-about-bg.webp") center / cover no-repeat,
     var(--night);
   color: var(--white);
 }
@@ -741,7 +742,7 @@ button {
   margin-left: -4vw;
   padding-top: 72px;
   color: transparent;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(7rem, 18vw, 18rem);
   font-weight: 400;
   line-height: 0.8;
@@ -767,7 +768,7 @@ button {
 
 .about-heading h2 {
   margin: 0;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(3.4rem, 7.4vw, 8rem);
   font-weight: 400;
   line-height: 0.86;
@@ -778,8 +779,7 @@ button {
 .about-content {
   margin-top: clamp(62px, 10vw, 150px);
   display: grid;
-  grid-template-columns: 1.15fr 0.85fr;
-  gap: clamp(50px, 10vw, 170px);
+  grid-template-columns: minmax(0, 700px);
 }
 
 .about-statement {
@@ -795,122 +795,6 @@ button {
 .about-statement strong {
   color: var(--white);
   font-weight: 500;
-}
-
-.about-system {
-  align-self: start;
-  display: grid;
-  justify-items: center;
-  gap: 20px;
-}
-
-.about-system-graphic {
-  position: relative;
-  width: min(100%, 430px);
-  aspect-ratio: 1;
-}
-
-.about-system-graphic::before,
-.about-system-graphic::after {
-  content: "";
-  position: absolute;
-  z-index: 2;
-  background: var(--white);
-}
-
-.about-system-graphic::before {
-  top: 50%;
-  right: 0;
-  left: 0;
-  height: 1px;
-  opacity: 0.22;
-}
-
-.about-system-graphic::after {
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-  opacity: 0.22;
-}
-
-.system-ring {
-  position: absolute;
-  z-index: 1;
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: 50%;
-  will-change: transform;
-}
-
-.system-ring::before {
-  content: "";
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  top: -5px;
-  left: 50%;
-  border-radius: 50%;
-  background: var(--white);
-}
-
-.system-ring-outer {
-  inset: 5%;
-}
-
-.system-ring-inner {
-  inset: 25%;
-  border-style: dashed;
-  opacity: 0.62;
-}
-
-.about-system-graphic > strong {
-  position: absolute;
-  z-index: 3;
-  top: 50%;
-  left: 50%;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
-  font-size: clamp(4rem, 8vw, 7rem);
-  font-weight: 400;
-  letter-spacing: 0.04em;
-  transform: translate(-50%, -50%);
-}
-
-.system-node {
-  position: absolute;
-  z-index: 4;
-  padding: 5px 9px;
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: var(--night);
-  font-size: 0.62rem;
-  font-weight: 700;
-  letter-spacing: 0.13em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.system-node-one {
-  top: 7%;
-  left: 8%;
-}
-
-.system-node-two {
-  top: 46%;
-  right: 0;
-}
-
-.system-node-three {
-  bottom: 8%;
-  left: 13%;
-}
-
-.about-system > p {
-  max-width: 320px;
-  margin: 0;
-  color: rgba(250, 248, 255, 0.58);
-  font-size: 0.72rem;
-  letter-spacing: 0.13em;
-  text-align: center;
-  text-transform: uppercase;
 }
 
 .about-contact {
@@ -930,7 +814,7 @@ button {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(3.3rem, 8.5vw, 9rem);
   line-height: 0.86;
   letter-spacing: 0.01em;
@@ -985,7 +869,7 @@ button {
 .image-fallback span {
   align-self: center;
   margin: auto;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(4rem, 8vw, 8rem);
 }
 
@@ -1037,7 +921,7 @@ button {
 .project-detail-title h1 {
   max-width: 1050px;
   margin: 12px 0 0;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(3.6rem, 9vw, 9.5rem);
   font-weight: 400;
   line-height: 0.84;
@@ -1097,7 +981,7 @@ button {
   margin-top: 30px;
   display: flex;
   justify-content: space-between;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(3rem, 8vw, 8rem);
   line-height: 0.9;
   letter-spacing: 0.01em;
@@ -1113,7 +997,7 @@ button {
 
 .section-title {
   margin: 0 0 24px;
-  font-family: "Bebas Neue", "Arial Narrow", sans-serif;
+  font-family: "Anton", "Impact", sans-serif;
   font-size: clamp(2.4rem, 6vw, 5rem);
   font-weight: 400;
   line-height: 0.95;
