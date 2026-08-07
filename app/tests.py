@@ -226,6 +226,8 @@ class PainelProjetosTest(TestCase):
         self.assertContains(resposta, 'data-organizer-form')
         self.assertContains(resposta, 'data-project-list')
         self.assertContains(resposta, 'organizador-projetos.js')
+        self.assertContains(resposta, 'organizer-cover-shade', count=3)
+        self.assertContains(resposta, self.projetos[0].capa.url)
         self.assertContains(resposta, 'Usar como destaque', count=3)
 
     def test_salva_ordem_e_projeto_em_destaque(self):

@@ -12,13 +12,13 @@
 <section class="organizer-section">
     <header class="organizer-header">
         <div>
-            <p class="eyebrow">Painel administrativo / projetos</p>
-            <h1>Organize seu<br>portfólio.</h1>
+            <p class="eyebrow">Painel administrativo / catálogo</p>
+            <h1>Catálogo de<br>projetos.</h1>
         </div>
         <div class="organizer-intro">
             <p>
-                Arraste os projetos pela alça para definir a ordem em que aparecem
-                no site e escolha qual deles ocupa o destaque da capa.
+                Organize a vitrine do portfólio arrastando os cards e escolha qual
+                projeto ocupa o destaque da capa.
             </p>
             <span>{{ projetos|length|stringformat:"02d" }} projetos cadastrados</span>
         </div>
@@ -65,7 +65,7 @@
                     {% if projeto.capa %}
                     <img
                         src="{{ projeto.capa.url }}"
-                        alt=""
+                        alt="Capa do projeto {{ projeto.titulo }}"
                         loading="lazy"
                         data-project-image
                     >
@@ -73,6 +73,8 @@
                     <div class="image-fallback" aria-hidden="true">
                         <span>HV</span>
                     </div>
+                    <div class="organizer-cover-shade" aria-hidden="true"></div>
+                    <span class="card-frame-lines" aria-hidden="true"></span>
                 </div>
 
                 <div class="organizer-project-copy">
