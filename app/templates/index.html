@@ -35,6 +35,13 @@
             </div>
 
             <figure class="cover-art" data-cover-art>
+                {% if projeto_destaque %}
+                <a
+                    class="cover-art-link"
+                    href="{% url 'detalhe_projeto' projeto_destaque.id %}"
+                    aria-label="Abrir projeto em destaque: {{ projeto_destaque.titulo }}"
+                >
+                {% endif %}
                 <div class="cover-art-frame" data-image-frame>
                     <span class="cover-card-label" aria-hidden="true">
                         <b>01</b>
@@ -58,6 +65,9 @@
                     <span>Projeto em destaque</span>
                     <strong>{% if projeto_destaque %}{{ projeto_destaque.titulo }}{% else %}Em construção{% endif %}</strong>
                 </figcaption>
+                {% if projeto_destaque %}
+                </a>
+                {% endif %}
             </figure>
 
         </div>

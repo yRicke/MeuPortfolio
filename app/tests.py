@@ -147,6 +147,11 @@ class PortfolioViewTest(TestCase):
         self.assertContains(resposta, 'about-hv-bg-mobile.webp')
         self.assertContains(resposta, 'favicon.ico')
         self.assertContains(resposta, 'projects-end-arrow')
+        self.assertContains(resposta, 'cover-art-link')
+        self.assertContains(
+            resposta,
+            f'Abrir projeto em destaque: {self.projeto.titulo}',
+        )
         self.assertNotContains(resposta, '<i>↘</i>', html=True)
         self.assertNotContains(resposta, 'data-about-system')
         self.assertNotContains(resposta, 'data-theme-toggle')

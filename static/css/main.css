@@ -412,6 +412,18 @@ button {
   filter: drop-shadow(0 32px 44px rgba(9, 6, 13, 0.42));
 }
 
+.cover-art-link {
+  position: relative;
+  z-index: 1;
+  display: block;
+  color: inherit;
+}
+
+.cover-art-link:focus-visible {
+  outline: 2px solid var(--primary-strong);
+  outline-offset: 7px;
+}
+
 .cover-art::before {
   content: "";
   position: absolute;
@@ -1931,10 +1943,27 @@ input[type="file"].capa-input {
     position: relative;
     width: calc(100% - 36px);
     padding: 92px 0 28px;
+    gap: 18px;
   }
 
   .projects-heading > p {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.56rem;
+    letter-spacing: 0.1em;
+    line-height: 1.2;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  .projects-heading > p span {
+    font-size: 0.86rem;
+  }
+
+  .projects-heading::after {
     display: none;
+    content: none;
   }
 
   .projects-viewport {
