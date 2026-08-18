@@ -1,3 +1,4 @@
+import base64
 import json
 from datetime import date
 from io import BytesIO
@@ -11,7 +12,7 @@ from django.test import RequestFactory, TestCase
 from django.urls import reverse
 from PIL import Image
 
-from app.models import ArquivoMidia, ImagemProjeto, Projeto
+from app.models import ArquivoMidia, ChaveAPI, ImagemProjeto, Projeto
 from app.storage import DatabaseStorage
 from app.views import servir_midia
 
@@ -494,3 +495,314 @@ class PainelProjetosTest(TestCase):
                     item.imagem.name.endswith('.webp')
                     for item in self.projetos[0].imagens.all()
                 ))
+
+
+class PainelChaveAPITest(TestCase):
+    def setUp(self):
+        usuario = get_user_model()
+        self.staff = usuario.objects.create_user(
+            username='staff',
+            password='senha-segura',
+            is_staff=True,
+        )
+        self.usuario_comum = usuario.objects.create_user(
+            username='comum',
+            password='senha-segura',
+        )
+
+    def test_painel_e_exclusivo_para_staff(self):
+        url = reverse('painel_chave_api')
+        resposta = self.client.get(url)
+        self.assertRedirects(
+            resposta,
+            f'{reverse("entrar")}?next={url}',
+            fetch_redirect_response=False,
+        )
+
+        self.client.force_login(self.usuario_comum)
+        self.assertEqual(self.client.get(url).status_code, 403)
+
+        self.client.force_login(self.staff)
+        self.assertEqual(self.client.get(url).status_code, 200)
+
+    def test_rotacao_exibe_chave_uma_vez_e_armazena_somente_hash(self):
+        self.client.force_login(self.staff)
+        resposta = self.client.post(reverse('painel_chave_api'))
+
+        self.assertEqual(resposta.status_code, 200)
+        chave = resposta.context['nova_chave']
+        credencial = ChaveAPI.objects.get()
+        self.assertContains(resposta, chave)
+        self.assertNotEqual(credencial.hash_chave, chave)
+        self.assertNotIn(chave, credencial.hash_chave)
+        self.assertTrue(ChaveAPI.autenticar(chave))
+        self.assertIn('no-store', resposta['Cache-Control'])
+
+        resposta_seguinte = self.client.get(reverse('painel_chave_api'))
+        self.assertNotContains(resposta_seguinte, chave)
+        self.assertContains(resposta_seguinte, f'{credencial.prefixo}...')
+
+    def test_rotacao_invalida_chave_anterior(self):
+        _, chave_anterior = ChaveAPI.rotacionar(self.staff)
+        _, chave_nova = ChaveAPI.rotacionar(self.staff)
+
+        self.assertFalse(ChaveAPI.autenticar(chave_anterior))
+        self.assertTrue(ChaveAPI.autenticar(chave_nova))
+
+    def test_login_respeita_destino_interno(self):
+        pagina_login = self.client.get(
+            f'{reverse("entrar")}?next={reverse("painel_chave_api")}'
+        )
+        self.assertContains(
+            pagina_login,
+            f'name="next" value="{reverse("painel_chave_api")}"',
+        )
+
+        resposta = self.client.post(reverse('entrar'), data={
+            'username': self.staff.username,
+            'password': 'senha-segura',
+            'next': reverse('painel_chave_api'),
+        })
+        self.assertRedirects(
+            resposta,
+            reverse('painel_chave_api'),
+            fetch_redirect_response=False,
+        )
+
+
+class APIProjetosTest(TestCase):
+    def setUp(self):
+        usuario = get_user_model().objects.create_user(
+            username='staff-api',
+            is_staff=True,
+        )
+        _, self.chave = ChaveAPI.rotacionar(usuario)
+        self.autorizacao = {'HTTP_AUTHORIZATION': f'Bearer {self.chave}'}
+
+    @staticmethod
+    def imagem_base64(nome='imagem.png', cor='blue'):
+        arquivo = ConversaoDeCapaTest.criar_imagem(nome, 'PNG', cor=cor)
+        return {
+            'nome': nome,
+            'conteudo_base64': base64.b64encode(arquivo.read()).decode('ascii'),
+        }
+
+    def requisicao_json(self, metodo, url, dados=None, **headers):
+        return getattr(self.client, metodo)(
+            url,
+            data=json.dumps(dados or {}),
+            content_type='application/json',
+            **self.autorizacao,
+            **headers,
+        )
+
+    def criar_projeto(self, titulo='Projeto API'):
+        resposta = self.requisicao_json('post', reverse('colecao_projetos_api'), {
+            'titulo': titulo,
+            'descricao': 'Criado por integração.',
+            'url': 'https://example.com/projeto',
+            'data_desenvolvimento': '2026-08',
+            'capa': self.imagem_base64('capa.png'),
+            'imagens': [self.imagem_base64('galeria.png', 'green')],
+        })
+        self.assertEqual(resposta.status_code, 201, resposta.content)
+        return resposta.json()['projeto']
+
+    def test_api_exige_bearer_token_valido(self):
+        url = reverse('colecao_projetos_api')
+        sem_chave = self.client.get(url)
+        chave_invalida = self.client.get(
+            url,
+            HTTP_AUTHORIZATION='Bearer portfolio_invalida',
+        )
+
+        self.assertEqual(sem_chave.status_code, 401)
+        self.assertEqual(chave_invalida.status_code, 401)
+        self.assertEqual(sem_chave['WWW-Authenticate'], 'Bearer')
+
+    def test_crud_completo_com_imagens_em_json(self):
+        with TemporaryDirectory() as diretorio, self.settings(MEDIA_ROOT=diretorio):
+            criado = self.criar_projeto()
+            projeto_id = criado['id']
+            self.assertTrue(criado['capa_url'].endswith('.webp'))
+            self.assertEqual(len(criado['imagens']), 1)
+            self.assertEqual(criado['data_desenvolvimento'], '2026-08-01')
+            self.assertTrue(criado['destaque'])
+
+            listagem = self.client.get(
+                reverse('colecao_projetos_api'),
+                **self.autorizacao,
+            )
+            self.assertEqual(listagem.json()['total'], 1)
+
+            atualizacao = self.requisicao_json(
+                'patch',
+                reverse('detalhe_projeto_api', args=[projeto_id]),
+                {'titulo': 'Projeto atualizado', 'url': ''},
+            )
+            self.assertEqual(atualizacao.status_code, 200)
+            self.assertEqual(
+                atualizacao.json()['projeto']['titulo'],
+                'Projeto atualizado',
+            )
+            self.assertEqual(atualizacao.json()['projeto']['url'], '')
+
+            exclusao = self.client.delete(
+                reverse('detalhe_projeto_api', args=[projeto_id]),
+                **self.autorizacao,
+            )
+            self.assertEqual(exclusao.status_code, 204)
+            self.assertFalse(Projeto.objects.filter(pk=projeto_id).exists())
+
+    def test_gerencia_ordem_dos_projetos_e_galeria(self):
+        with TemporaryDirectory() as diretorio, self.settings(MEDIA_ROOT=diretorio):
+            primeiro = self.criar_projeto('Primeiro')
+            segundo = self.criar_projeto('Segundo')
+
+            organizacao = self.requisicao_json(
+                'patch',
+                reverse('organizacao_projetos_api'),
+                {
+                    'ordem': [segundo['id'], primeiro['id']],
+                    'destaque': segundo['id'],
+                },
+            )
+            self.assertEqual(organizacao.status_code, 200)
+            self.assertEqual(
+                list(Projeto.objects.values_list('pk', flat=True)),
+                [segundo['id'], primeiro['id']],
+            )
+
+            adicao = self.requisicao_json(
+                'post',
+                reverse('colecao_imagens_api', args=[primeiro['id']]),
+                {'imagens': [self.imagem_base64('segunda.png', 'yellow')]},
+            )
+            self.assertEqual(adicao.status_code, 201, adicao.content)
+            imagens = list(
+                Projeto.objects.get(pk=primeiro['id']).imagens.values_list(
+                    'pk',
+                    flat=True,
+                )
+            )
+            ordem_imagens = self.requisicao_json(
+                'patch',
+                reverse('organizacao_imagens_api', args=[primeiro['id']]),
+                {'ordem': list(reversed(imagens))},
+            )
+            self.assertEqual(ordem_imagens.status_code, 200)
+
+            exclusao = self.client.delete(
+                reverse(
+                    'detalhe_imagem_api',
+                    args=[primeiro['id'], imagens[0]],
+                ),
+                **self.autorizacao,
+            )
+            self.assertEqual(exclusao.status_code, 204)
+
+    def test_recusa_dados_invalidos_sem_criar_projeto(self):
+        resposta = self.requisicao_json('post', reverse('colecao_projetos_api'), {
+            'titulo': '',
+            'descricao': 'Descrição',
+        })
+
+        self.assertEqual(resposta.status_code, 400)
+        self.assertIn('titulo', resposta.json()['erro']['campos'])
+        self.assertFalse(Projeto.objects.exists())
+
+    def test_chave_rotacionada_perde_acesso_imediatamente(self):
+        autorizacao_antiga = self.autorizacao
+        usuario = get_user_model().objects.get(username='staff-api')
+        _, chave_nova = ChaveAPI.rotacionar(usuario)
+
+        resposta_antiga = self.client.get(
+            reverse('colecao_projetos_api'),
+            **autorizacao_antiga,
+        )
+        resposta_nova = self.client.get(
+            reverse('colecao_projetos_api'),
+            HTTP_AUTHORIZATION=f'Bearer {chave_nova}',
+        )
+        self.assertEqual(resposta_antiga.status_code, 401)
+        self.assertEqual(resposta_nova.status_code, 200)
+
+
+class MCPProjetosTest(TestCase):
+    def setUp(self):
+        usuario = get_user_model().objects.create_user(
+            username='staff-mcp',
+            is_staff=True,
+        )
+        _, chave = ChaveAPI.rotacionar(usuario)
+        self.autorizacao = {'HTTP_AUTHORIZATION': f'Bearer {chave}'}
+
+    def enviar(self, identificador, metodo, parametros=None):
+        return self.client.post(
+            reverse('endpoint_mcp'),
+            data=json.dumps({
+                'jsonrpc': '2.0',
+                'id': identificador,
+                'method': metodo,
+                'params': parametros or {},
+            }),
+            content_type='application/json',
+            HTTP_ACCEPT='application/json, text/event-stream',
+            **self.autorizacao,
+        )
+
+    def test_handshake_e_lista_ferramentas(self):
+        inicializacao = self.enviar(1, 'initialize', {
+            'protocolVersion': '2025-06-18',
+            'capabilities': {},
+            'clientInfo': {'name': 'teste', 'version': '1.0'},
+        })
+        ferramentas = self.enviar(2, 'tools/list')
+
+        self.assertEqual(inicializacao.status_code, 200)
+        self.assertEqual(
+            inicializacao.json()['result']['serverInfo']['name'],
+            'portfolio-projetos',
+        )
+        nomes = {
+            item['name']
+            for item in ferramentas.json()['result']['tools']
+        }
+        self.assertEqual(len(nomes), 9)
+        self.assertIn('criar_projeto', nomes)
+        self.assertIn('organizar_imagens_projeto', nomes)
+
+    def test_ferramenta_cria_e_lista_projeto(self):
+        criacao = self.enviar(1, 'tools/call', {
+            'name': 'criar_projeto',
+            'arguments': {
+                'titulo': 'Projeto via MCP',
+                'descricao': 'Criado pelo protocolo.',
+            },
+        })
+        listagem = self.enviar(2, 'tools/call', {
+            'name': 'listar_projetos',
+            'arguments': {},
+        })
+
+        self.assertFalse(criacao.json()['result']['isError'])
+        self.assertEqual(
+            criacao.json()['result']['structuredContent']['projeto']['titulo'],
+            'Projeto via MCP',
+        )
+        self.assertEqual(
+            listagem.json()['result']['structuredContent']['total'],
+            1,
+        )
+
+    def test_notificacao_retorna_accepted(self):
+        resposta = self.client.post(
+            reverse('endpoint_mcp'),
+            data=json.dumps({
+                'jsonrpc': '2.0',
+                'method': 'notifications/initialized',
+            }),
+            content_type='application/json',
+            **self.autorizacao,
+        )
+        self.assertEqual(resposta.status_code, 202)

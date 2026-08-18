@@ -1,0 +1,7 @@
+[mcp_servers.portfolio]
+url = "https://SEU-DOMINIO/mcp/"
+bearer_token_env_var = "PORTFOLIO_API_TOKEN"
+required = true
+default_tools_approval_mode = "writes"
+startup_timeout_sec = 15
+tool_timeout_sec = 60

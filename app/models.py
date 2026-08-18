@@ -1,6 +1,10 @@
+import hashlib
+import hmac
+import secrets
 from io import BytesIO
 from pathlib import Path
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.db import models, router, transaction
@@ -12,6 +16,72 @@ from PIL import Image, ImageOps
 # Create your models here.
 
 NAO_INFORMADO = object()
+
+
+class ChaveAPI(models.Model):
+    identificador = models.PositiveSmallIntegerField(
+        primary_key=True,
+        default=1,
+        editable=False,
+    )
+    hash_chave = models.CharField(max_length=64, editable=False)
+    prefixo = models.CharField(max_length=20, editable=False)
+    data_rotacao = models.DateTimeField(auto_now=True)
+    rotacionada_por = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        blank=True,
+        null=True,
+        editable=False,
+        on_delete=models.SET_NULL,
+        related_name='+',
+    )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=Q(identificador=1),
+                name='app_chave_api_identificador_unico',
+            ),
+        ]
+        verbose_name = 'chave da API'
+        verbose_name_plural = 'chaves da API'
+
+    def __str__(self):
+        return f'{self.prefixo}...'
+
+    @staticmethod
+    def _calcular_hash(chave):
+        return hashlib.sha256(chave.encode('utf-8')).hexdigest()
+
+    @classmethod
+    def rotacionar(cls, usuario):
+        chave = f'portfolio_{secrets.token_urlsafe(32)}'
+        credencial, _ = cls.objects.update_or_create(
+            identificador=1,
+            defaults={
+                'hash_chave': cls._calcular_hash(chave),
+                'prefixo': chave[:20],
+                'rotacionada_por': usuario,
+            },
+        )
+        return credencial, chave
+
+    @classmethod
+    def autenticar(cls, chave):
+        if not chave:
+            return False
+
+        hash_esperado = cls.objects.filter(identificador=1).values_list(
+            'hash_chave',
+            flat=True,
+        ).first()
+        if not hash_esperado:
+            return False
+
+        return hmac.compare_digest(
+            hash_esperado,
+            cls._calcular_hash(chave),
+        )
 
 
 class ArquivoMidia(models.Model):
@@ -256,5 +326,18 @@ def excluir_arquivo_da_imagem(sender, instance, using, **kwargs):
     armazenamento = instance.imagem.storage
     transaction.on_commit(
         lambda: sender._excluir_imagem_sem_uso(nome, armazenamento, using),
+        using=using,
+    )
+
+
+@receiver(post_delete, sender=Projeto)
+def excluir_arquivo_da_capa(sender, instance, using, **kwargs):
+    if not instance.capa or not instance.capa.name:
+        return
+
+    nome = instance.capa.name
+    armazenamento = instance.capa.storage
+    transaction.on_commit(
+        lambda: sender._excluir_capa_sem_uso(nome, armazenamento, using),
         using=using,
     )

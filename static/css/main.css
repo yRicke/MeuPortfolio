@@ -1723,6 +1723,80 @@ textarea {
   text-transform: uppercase;
 }
 
+.api-key-section {
+  display: grid;
+  gap: 24px;
+}
+
+.api-key-card,
+.api-key-instructions {
+  display: grid;
+  gap: 22px;
+}
+
+.api-key-card > p,
+.api-key-instructions > p,
+.api-key-reveal p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.api-key-reveal {
+  padding: 18px;
+  display: grid;
+  gap: 8px;
+  border: 1px solid var(--primary);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--accent) 38%, transparent);
+}
+
+.api-key-reveal code,
+.api-key-instructions > code {
+  padding: 14px;
+  overflow-wrap: anywhere;
+  border-radius: 8px;
+  background: var(--night);
+  color: var(--paper);
+  user-select: all;
+}
+
+.api-key-meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.api-key-meta div {
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.api-key-meta dt {
+  margin-bottom: 7px;
+  color: var(--muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.api-key-meta dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.api-key-empty {
+  box-shadow: none;
+}
+
+@media (max-width: 720px) {
+  .api-key-meta {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Drag and drop */
 input[type="file"].capa-input {
   position: absolute;

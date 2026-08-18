@@ -19,6 +19,9 @@
             <a class="nav-admin" href="{% url 'painel_projetos' %}">Organizar</a>
             <a class="nav-admin" href="{% url 'adicionar_projeto' %}">+ Projeto</a>
             {% endif %}
+            {% if user.is_staff %}
+            <a class="nav-admin" href="{% url 'painel_chave_api' %}">API</a>
+            {% endif %}
             {% if user.is_authenticated %}
             <a class="nav-admin" href="{% url 'sair' %}">Sair</a>
             {% endif %}

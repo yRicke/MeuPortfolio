@@ -9,9 +9,12 @@ from django.db import transaction
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_http_methods, require_POST
 
-from app.models import ArquivoMidia, Projeto
+from app.models import ArquivoMidia, ChaveAPI, Projeto
+from app.project_service import ErroAPI, organizar_projetos
 
 # Create your views here.
 
@@ -68,44 +71,39 @@ def painel_projetos(request):
             'mensagem': 'Os dados enviados são inválidos.',
         }, status=400)
 
-    if len(ordem) != len(set(ordem)):
+    try:
+        resultado = organizar_projetos(ordem, destaque)
+    except ErroAPI as erro:
         return JsonResponse({
             'ok': False,
-            'mensagem': 'A ordem contém projetos repetidos.',
-        }, status=400)
-
-    with transaction.atomic():
-        projetos = list(Projeto.objects.select_for_update())
-        projetos_por_id = {projeto.pk: projeto for projeto in projetos}
-
-        if set(ordem) != set(projetos_por_id):
-            return JsonResponse({
-                'ok': False,
-                'mensagem': 'A lista de projetos está incompleta ou desatualizada.',
-            }, status=400)
-
-        if ordem and destaque not in projetos_por_id:
-            return JsonResponse({
-                'ok': False,
-                'mensagem': 'Escolha um projeto em destaque.',
-            }, status=400)
-
-        Projeto.objects.filter(destaque=True).update(destaque=False)
-
-        for posicao, projeto_id in enumerate(ordem):
-            projeto = projetos_por_id[projeto_id]
-            projeto.ordem = posicao
-
-        if projetos:
-            Projeto.objects.bulk_update(projetos, ('ordem',))
-            Projeto.objects.filter(pk=destaque).update(destaque=True)
+            'mensagem': erro.mensagem,
+        }, status=erro.status)
 
     return JsonResponse({
         'ok': True,
         'mensagem': 'Organização salva com sucesso.',
-        'ordem': ordem,
-        'destaque': destaque,
+        **resultado,
     })
+
+
+@login_required(login_url='entrar')
+@never_cache
+@require_http_methods(['GET', 'POST'])
+def painel_chave_api(request):
+    if not request.user.is_staff:
+        raise PermissionDenied
+
+    nova_chave = None
+    credencial = ChaveAPI.objects.filter(identificador=1).first()
+    if request.method == 'POST':
+        credencial, nova_chave = ChaveAPI.rotacionar(request.user)
+
+    resposta = render(request, 'painel_chave_api.html', {
+        'credencial': credencial,
+        'nova_chave': nova_chave,
+    })
+    resposta['Cache-Control'] = 'no-store'
+    return resposta
 
 
 def detalhe_projeto(request, projeto_id):
@@ -213,10 +211,19 @@ def entrar(request):
         if user is not None:
             login(request, user)
             messages.success(request, 'Logado com sucesso.')
+            proxima_url = request.POST.get('next') or request.GET.get('next')
+            if proxima_url and url_has_allowed_host_and_scheme(
+                proxima_url,
+                allowed_hosts={request.get_host()},
+                require_https=request.is_secure(),
+            ):
+                return redirect(proxima_url)
             return redirect('index')
         else:
             messages.error(request, 'Usuário ou senha inválidos.')
-    return render(request, 'entrar.html')
+    return render(request, 'entrar.html', {
+        'next': request.POST.get('next') or request.GET.get('next', ''),
+    })
 
 def sair(request):
     logout(request)

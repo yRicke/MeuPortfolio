@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Chave da API — Portfólio{% endblock %}
+
+{% block content %}
+<section class="api-key-section">
+    <div>
+        <p class="eyebrow">Painel administrativo / integrações</p>
+        <h1 class="section-title">Chave da API</h1>
+    </div>
+
+    <div class="form-card api-key-card">
+        <p>
+            Esta chave autoriza o gerenciamento completo dos projetos pela API REST
+            e pelo endpoint MCP. Ao gerar outra chave, a anterior deixa de funcionar
+            imediatamente.
+        </p>
+
+        {% if nova_chave %}
+        <div class="api-key-reveal" role="status">
+            <strong>Copie a nova chave agora</strong>
+            <p>Por segurança, o valor completo não será exibido novamente.</p>
+            <code data-api-key>{{ nova_chave }}</code>
+        </div>
+        {% elif credencial %}
+        <dl class="api-key-meta">
+            <div>
+                <dt>Chave atual</dt>
+                <dd><code>{{ credencial.prefixo }}...</code></dd>
+            </div>
+            <div>
+                <dt>Última rotação</dt>
+                <dd>{{ credencial.data_rotacao|date:"d/m/Y H:i" }}</dd>
+            </div>
+            <div>
+                <dt>Responsável</dt>
+                <dd>{{ credencial.rotacionada_por|default:"Usuário removido" }}</dd>
+            </div>
+        </dl>
+        {% else %}
+        <div class="empty-state api-key-empty">
+            Ainda não existe uma chave. Gere a primeira para habilitar a API.
+        </div>
+        {% endif %}
+
+        <form method="post" class="form-actions">
+            {% csrf_token %}
+            <button class="button" type="submit">
+                {% if credencial %}Trocar chave{% else %}Gerar primeira chave{% endif %}
+            </button>
+            {% if user.is_superuser %}
+            <a class="ghost-button" href="{% url 'painel_projetos' %}">Voltar</a>
+            {% else %}
+            <a class="ghost-button" href="{% url 'index' %}">Voltar</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <div class="form-card api-key-instructions">
+        <span class="chip">Codex / MCP remoto</span>
+        <p>Configure o servidor com a URL abaixo e passe a chave por variável de ambiente.</p>
+        <code>{{ request.scheme }}://{{ request.get_host }}{% url 'endpoint_mcp' %}</code>
+    </div>
+</section>
+{% endblock %}
