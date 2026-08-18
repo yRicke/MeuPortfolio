@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "python manage.py migrate --noinput",
   "functions": {
     "api/index.py": {
       "maxDuration": 60,

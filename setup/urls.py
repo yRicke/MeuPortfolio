@@ -21,6 +21,11 @@ from django.conf import settings
 from django.conf.urls.static import static
 from app import api, mcp
 
+handler400 = 'app.error_views.erro_400'
+handler403 = 'app.error_views.erro_403'
+handler404 = 'app.error_views.erro_404'
+handler500 = 'app.error_views.erro_500'
+
 urlpatterns = [
     path('admindjango/', admin.site.urls),
     path('', views.index, name='index'),

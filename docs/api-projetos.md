@@ -6,7 +6,7 @@ rotacionável por usuários `is_staff`.
 
 ## Ativação e rotação da chave
 
-1. Execute as migrações com `python manage.py migrate`.
+1. Fora da Vercel, execute as migrações com `python manage.py migrate`.
 2. Entre no site com uma conta staff.
 3. Acesse `/painel/api/` e selecione **Gerar primeira chave**.
 4. Copie o valor exibido. A aplicação armazena apenas o hash, então a chave não
@@ -14,6 +14,12 @@ rotacionável por usuários `is_staff`.
 
 Ao selecionar **Trocar chave**, a chave anterior perde o acesso imediatamente.
 Atualize os clientes que usam a credencial logo após a rotação.
+
+Na Vercel, o `buildCommand` versionado em `vercel.json` executa
+`python manage.py migrate --noinput` antes de ativar cada novo deployment. A
+variável `DATABASE_URL` precisa estar disponível no ambiente correspondente; se
+uma migration falhar, o build também falha e o artefato incompleto não é
+publicado.
 
 ## Conectar ao Codex por MCP
 

@@ -6,12 +6,14 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 from django.contrib.auth import get_user_model
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import SimpleUploadedFile
-from django.test import RequestFactory, TestCase
-from django.urls import reverse
+from django.test import Client, RequestFactory, SimpleTestCase, TestCase, override_settings
+from django.urls import get_resolver, reverse
 from PIL import Image
 
+from app.error_views import erro_500
 from app.models import ArquivoMidia, ChaveAPI, ImagemProjeto, Projeto
 from app.storage import DatabaseStorage
 from app.views import servir_midia
@@ -806,3 +808,120 @@ class MCPProjetosTest(TestCase):
             **self.autorizacao,
         )
         self.assertEqual(resposta.status_code, 202)
+
+
+@override_settings(DEBUG=False)
+class PaginasErroTest(TestCase):
+    def setUp(self):
+        self.staff = get_user_model().objects.create_user(
+            username='staff-erros',
+            password='senha-segura',
+            is_staff=True,
+        )
+        self.usuario_comum = get_user_model().objects.create_user(
+            username='comum-erros',
+            password='senha-segura',
+        )
+
+    def test_handlers_globais_estao_registrados(self):
+        resolvedor = get_resolver()
+
+        self.assertEqual(
+            resolvedor.resolve_error_handler(400).__module__,
+            'app.error_views',
+        )
+        self.assertEqual(
+            resolvedor.resolve_error_handler(403).__module__,
+            'app.error_views',
+        )
+        self.assertEqual(
+            resolvedor.resolve_error_handler(404).__module__,
+            'app.error_views',
+        )
+        self.assertEqual(
+            resolvedor.resolve_error_handler(500).__module__,
+            'app.error_views',
+        )
+
+    def test_exibe_pagina_404_personalizada(self):
+        resposta = self.client.get('/pagina-que-nao-existe/')
+
+        self.assertEqual(resposta.status_code, 404)
+        self.assertTemplateUsed(resposta, 'erro.html')
+        self.assertContains(
+            resposta,
+            'Página não encontrada',
+            status_code=404,
+        )
+        self.assertContains(resposta, '404', status_code=404)
+
+    def test_exibe_pagina_403_personalizada(self):
+        self.client.force_login(self.usuario_comum)
+        resposta = self.client.get(reverse('painel_chave_api'))
+
+        self.assertEqual(resposta.status_code, 403)
+        self.assertTemplateUsed(resposta, 'erro.html')
+        self.assertContains(resposta, 'Acesso negado', status_code=403)
+
+    def test_exibe_pagina_405_personalizada(self):
+        self.client.force_login(self.staff)
+        resposta = self.client.put(reverse('painel_chave_api'))
+
+        self.assertEqual(resposta.status_code, 405)
+        self.assertTemplateUsed(resposta, 'erro.html')
+        self.assertContains(resposta, 'Ação não permitida', status_code=405)
+        self.assertContains(resposta, 'GET, POST', status_code=405)
+        self.assertEqual(resposta['Allow'], 'GET, POST')
+
+    def test_exibe_pagina_403_para_falha_csrf(self):
+        cliente_csrf = Client(enforce_csrf_checks=True)
+        cliente_csrf.force_login(self.staff)
+        resposta = cliente_csrf.post(reverse('painel_chave_api'))
+
+        self.assertEqual(resposta.status_code, 403)
+        self.assertTemplateUsed(resposta, 'erro.html')
+        self.assertContains(resposta, 'sessão do formulário expirou', status_code=403)
+
+    def test_exibe_pagina_500_sem_detalhes_tecnicos(self):
+        resposta = erro_500(RequestFactory().get('/falha/'))
+
+        self.assertEqual(resposta.status_code, 500)
+        self.assertContains(resposta, 'Erro interno', status_code=500)
+        self.assertNotContains(
+            resposta,
+            'Traceback',
+            status_code=500,
+        )
+
+    def test_erro_de_api_continua_sendo_json(self):
+        resposta = self.client.get('/api/v1/recurso-inexistente/')
+
+        self.assertEqual(resposta.status_code, 404)
+        self.assertEqual(resposta['Content-Type'], 'application/json')
+        self.assertEqual(resposta.json()['erro']['codigo'], 'erro_404')
+
+    def test_metodo_invalido_da_api_retorna_json_e_allow(self):
+        _, chave = ChaveAPI.rotacionar(self.staff)
+        resposta = self.client.put(
+            reverse('colecao_projetos_api'),
+            data='{}',
+            content_type='application/json',
+            HTTP_AUTHORIZATION=f'Bearer {chave}',
+        )
+
+        self.assertEqual(resposta.status_code, 405)
+        self.assertEqual(resposta['Content-Type'], 'application/json')
+        self.assertEqual(resposta['Allow'], 'GET, POST')
+        self.assertEqual(resposta.json()['erro']['codigo'], 'erro_405')
+
+
+class ConfiguracaoDeployTest(SimpleTestCase):
+    def test_build_da_vercel_aplica_migrations(self):
+        configuracao = json.loads(
+            (settings.BASE_DIR / 'vercel.json').read_text(encoding='utf-8')
+        )
+
+        self.assertEqual(
+            configuracao['buildCommand'],
+            'python manage.py migrate --noinput',
+        )

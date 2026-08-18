@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    {% load static %}
+    <title>{{ codigo }} — {{ titulo }}</title>
+    <link rel="icon" href="{% static 'favicon.ico' %}" sizes="any">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Roboto+Condensed:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+</head>
+<body class="error-page">
+    <header class="error-nav">
+        <a class="brand" href="{% url 'index' %}" aria-label="Voltar ao início">
+            <span class="brand-mark" aria-hidden="true">
+                <img src="{% static 'images/logo-hv.webp' %}" alt="">
+            </span>
+            <small>Henrique Vieira</small>
+        </a>
+    </header>
+
+    <main class="error-shell">
+        <div class="error-code" aria-hidden="true">{{ codigo }}</div>
+        <div class="error-copy">
+            <p class="eyebrow">Erro / {{ codigo }}</p>
+            <h1>{{ titulo }}.</h1>
+            <p>{{ mensagem }}</p>
+            {% if detalhe %}<p class="error-detail">{{ detalhe }}</p>{% endif %}
+            <div class="form-actions">
+                <a class="button" href="{% url 'index' %}">Voltar ao início</a>
+                <button class="ghost-button" type="button" onclick="history.back()">
+                    Página anterior
+                </button>
+            </div>
+        </div>
+    </main>
+</body>
+</html>
