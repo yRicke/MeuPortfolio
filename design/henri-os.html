@@ -1,0 +1,319 @@
+<div id="henri-os-concept" class="viz-carousel" aria-label="Direções visuais do Henri OS" data-previous-label="Anterior" data-next-label="Próximo">
+  <section data-variant="Clássico" aria-label="Desktop clássico do Henri OS">
+    <div class="hos-desktop" data-skin="classic" aria-label="Henri OS clássico"></div>
+  </section>
+  <section data-variant="Estúdio pessoal" aria-label="Desktop pessoal do Henri OS" hidden>
+    <div class="hos-desktop" data-skin="studio" aria-label="Henri OS estúdio pessoal"></div>
+  </section>
+</div>
+<style>
+  #henri-os-concept .hos-desktop {
+    --hos-face: #c0c0c0; --hos-light: #fff; --hos-mid: #808080; --hos-dark: #222;
+    --hos-paper: #fffff4; --hos-ink: #151515; --hos-blue: #000080; --hos-teal: #008080;
+    --hos-selected: #fff; --hos-line-opacity: .055;
+    position: relative; height: 590px; width: 100%; overflow: hidden;
+    background: var(--hos-teal); color: var(--hos-ink); font: 13px/1.45 Tahoma, Verdana, sans-serif;
+    isolation: isolate; color-scheme: light;
+  }
+  #henri-os-concept .hos-desktop[data-skin="studio"] { --hos-teal: #4b425e; --hos-blue: #462d70; }
+  #henri-os-concept .hos-desktop *, #henri-os-concept .hos-desktop *::before, #henri-os-concept .hos-desktop *::after { box-sizing: border-box; }
+  #henri-os-concept .hos-desktop button, #henri-os-concept .hos-desktop input { font: inherit; color: inherit; }
+  #henri-os-concept .hos-desktop button { border-radius: 0; }
+  #henri-os-concept .hos-desktop [hidden] { display: none !important; }
+  #henri-os-concept .hos-wallpaper { position: absolute; inset: 0 0 42px; pointer-events: none; }
+  #henri-os-concept .hos-watermark { position: absolute; right: 30px; bottom: 24px; text-align: right; color: #c1e4e1; }
+  #henri-os-concept .hos-watermark strong { display: block; font: 500 54px/1.1 'Courier New', monospace; letter-spacing: -4px; }
+  #henri-os-concept .hos-watermark span { font: 12px 'Courier New', monospace; letter-spacing: 2px; }
+  #henri-os-concept [data-skin="studio"] .hos-wallpaper { background-image: repeating-linear-gradient(0deg, #ffffff05 0 1px, transparent 1px 4px), repeating-linear-gradient(90deg, #ffffff05 0 1px, transparent 1px 4px); }
+  #henri-os-concept [data-skin="studio"] .hos-watermark { top: 24px; bottom: auto; right: 30px; color: #d8cadf; }
+  #henri-os-concept [data-skin="studio"] .hos-watermark strong { font-size: 38px; letter-spacing: -2px; }
+  #henri-os-concept .hos-icons { position: absolute; z-index: 1; top: 18px; left: 14px; display: grid; gap: 11px; }
+  #henri-os-concept [data-skin="studio"] .hos-icons { top: 26px; grid-template-columns: 82px 82px; }
+  #henri-os-concept .hos-shortcut { display: grid; justify-items: center; gap: 5px; width: 82px; padding: 4px 1px; border: 0; background: transparent; color: #fff; }
+  #henri-os-concept .hos-shortcut span:last-child { padding: 1px 3px; text-shadow: 1px 1px #222; font-size: 12px; }
+  #henri-os-concept .hos-shortcut:focus-visible span:last-child { background: var(--hos-blue); outline: 1px dotted white; }
+  #henri-os-concept .hos-glyph { width: 36px; height: 32px; position: relative; display: inline-block; filter: drop-shadow(1px 1px 0 #111); flex: 0 0 auto; }
+  #henri-os-concept .hos-glyph.folder { width: 36px; height: 27px; margin-top: 5px; background: #f0ce52; border: 2px solid #42350c; box-shadow: inset 2px 2px #ffeb8b; }
+  #henri-os-concept .hos-glyph.folder::before { content: ''; position: absolute; width: 16px; height: 6px; top: -6px; left: -2px; background: #f0ce52; border: 2px solid #42350c; border-bottom: 0; }
+  #henri-os-concept .hos-glyph.note { width: 27px; margin: 0 4px 0 5px; background: #fffff4; border: 2px solid #222; box-shadow: -3px 0 #2c82af; }
+  #henri-os-concept .hos-glyph.note::after { content: ''; position: absolute; inset: 6px 4px; background: repeating-linear-gradient(to bottom, #7290a0 0 2px, transparent 2px 5px); }
+  #henri-os-concept .hos-glyph.mail { height: 25px; margin-top: 7px; border: 2px solid #222; background: #ececda; box-shadow: inset 2px 2px #fff; }
+  #henri-os-concept .hos-glyph.mail::after { content: ''; position: absolute; left: 6px; top: -10px; width: 20px; height: 20px; transform: rotate(45deg); border-right: 2px solid #555; border-bottom: 2px solid #555; }
+  #henri-os-concept .hos-glyph.disk { width: 29px; margin-left: 3px; height: 31px; background: #28558c; border: 2px solid #111; box-shadow: inset 2px 2px #5989b2; }
+  #henri-os-concept .hos-glyph.disk::before { content: ''; position: absolute; background: #ddd; width: 18px; height: 9px; top: 0; left: 3px; border: 1px solid #777; }
+  #henri-os-concept .hos-glyph.disk::after { content: ''; position: absolute; background: #f4f1d9; width: 19px; height: 12px; bottom: 1px; left: 3px; border-top: 3px solid #a53333; }
+  #henri-os-concept .hos-glyph.gear { width: 31px; height: 27px; margin: 5px 2px 0 3px; background: #abaea4; border: 3px solid #222; box-shadow: inset 2px 2px #fff; }
+  #henri-os-concept .hos-glyph.gear::before { content: ''; position: absolute; left: 7px; top: 4px; width: 11px; height: 11px; border: 3px solid #315788; background: #eee; }
+  #henri-os-concept .hos-glyph.computer { background: #c0c0c0; border: 2px solid #222; box-shadow: inset 2px 2px #fff; height: 25px; }
+  #henri-os-concept .hos-glyph.computer::before { content: ''; position: absolute; inset: 4px; background: #246ca0; border: 2px solid #333; }
+  #henri-os-concept .hos-glyph.computer::after { content: ''; position: absolute; height: 6px; width: 30px; left: 1px; bottom: -8px; background: #c0c0c0; border: 2px solid #222; }
+  #henri-os-concept .hos-window { position: absolute; z-index: 3; width: 450px; max-width: calc(100% - 12px); background: var(--hos-face); padding: 3px; border: 1px solid var(--hos-dark); box-shadow: inset 1px 1px var(--hos-light), inset -1px -1px var(--hos-mid), 2px 2px #0005; }
+  #henri-os-concept .hos-window.active .hos-title { background: linear-gradient(90deg, var(--hos-blue), #276ca0); color: #fff; }
+  #henri-os-concept [data-skin="studio"] .hos-window.active .hos-title { background: linear-gradient(90deg, var(--hos-blue), #876498); }
+  #henri-os-concept .hos-title { height: 29px; display: flex; align-items: center; gap: 7px; background: #808080; color: #eee; padding: 3px 4px; touch-action: none; user-select: none; cursor: move; }
+  #henri-os-concept .hos-title-text { min-width: 0; flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  #henri-os-concept .hos-title-symbol { font: 16px 'Courier New', monospace; }
+  #henri-os-concept .hos-controls { display: flex; gap: 3px; }
+  #henri-os-concept .hos-bevel { border: 0; background: var(--hos-face); padding: 5px 12px; box-shadow: inset 1px 1px var(--hos-light), inset -1px -1px var(--hos-dark), inset 2px 2px #dfdfdf, inset -2px -2px var(--hos-mid); }
+  #henri-os-concept .hos-bevel:active, #henri-os-concept .hos-bevel[aria-pressed="true"] { box-shadow: inset 1px 1px var(--hos-dark), inset -1px -1px var(--hos-light), inset 2px 2px var(--hos-mid); }
+  #henri-os-concept .hos-controls button { font: 500 15px/1 'Courier New', monospace; color: #111; width: 23px; height: 22px; padding: 1px; }
+  #henri-os-concept .hos-menubar { display: flex; gap: 15px; padding: 5px 9px; font-size: 12px; }
+  #henri-os-concept .hos-menubar span:first-letter { text-decoration: underline; }
+  #henri-os-concept .hos-content { padding: 19px 22px; background: var(--hos-paper); border: 2px solid; border-color: var(--hos-mid) var(--hos-light) var(--hos-light) var(--hos-mid); min-height: 230px; }
+  #henri-os-concept .hos-content p { margin: 0 0 12px; }
+  #henri-os-concept .hos-content h2 { margin: 0 0 11px; font: 500 29px/1.15 'Courier New', monospace; letter-spacing: -1px; }
+  #henri-os-concept .hos-eyebrow { margin-bottom: 10px; font: 11px 'Courier New', monospace; text-transform: uppercase; letter-spacing: 1px; color: #555; }
+  #henri-os-concept .hos-status { display: flex; gap: 5px; padding-top: 4px; font-size: 11px; }
+  #henri-os-concept .hos-status span { flex: 1; padding: 2px 5px; box-shadow: inset 1px 1px var(--hos-mid), inset -1px -1px var(--hos-light); }
+  #henri-os-concept .hos-footer { display: flex; gap: 9px; margin-top: 18px; flex-wrap: wrap; }
+  #henri-os-concept .hos-project-list { display: grid; gap: 12px; }
+  #henri-os-concept .hos-project { display: flex; align-items: center; gap: 13px; padding-bottom: 10px; border-bottom: 1px dotted #999; }
+  #henri-os-concept .hos-project:last-child { border: 0; padding-bottom: 0; }
+  #henri-os-concept .hos-project strong { font-weight: 500; display: block; }
+  #henri-os-concept .hos-project small { font-size: 11px; color: #555; }
+  #henri-os-concept .hos-tags { margin: 18px 0 12px; font: 12px/1.7 'Courier New', monospace; }
+  #henri-os-concept .hos-letter { font: 13px/1.8 'Courier New', monospace; }
+  #henri-os-concept .hos-tape { background: #26202d; color: #e2d3c3; padding: 15px 18px; margin: -19px -22px 18px; display: flex; justify-content: space-between; font: 12px 'Courier New', monospace; }
+  #henri-os-concept .hos-mail-row { display: flex; padding: 7px 0; gap: 12px; border-bottom: 1px solid #c5c5b3; }
+  #henri-os-concept .hos-mail-row b { font-weight: 500; min-width: 51px; }
+  #henri-os-concept .hos-taskbar { position: absolute; inset: auto 0 0; height: 42px; z-index: 900; padding: 5px; background: var(--hos-face); box-shadow: inset 0 1px var(--hos-light), inset 0 2px #dfdfdf; display: flex; align-items: center; gap: 6px; }
+  #henri-os-concept .hos-start { display: flex; align-items: center; gap: 7px; height: 31px; font-weight: 500; padding: 4px 8px; }
+  #henri-os-concept .hos-logo { width: 18px; height: 18px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; transform: skewY(-8deg); }
+  #henri-os-concept .hos-logo i { display: block; background: #f14e40; }
+  #henri-os-concept .hos-logo i:nth-child(2) { background: #53b956; }
+  #henri-os-concept .hos-logo i:nth-child(3) { background: #488aca; }
+  #henri-os-concept .hos-logo i:nth-child(4) { background: #efce45; }
+  #henri-os-concept .hos-tasks { display: flex; gap: 5px; min-width: 0; flex: 1; }
+  #henri-os-concept .hos-task { min-width: 0; max-width: 163px; flex: 1; padding: 6px 8px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; text-align: left; font-size: 12px; height: 31px; }
+  #henri-os-concept .hos-task[aria-pressed="true"] { background: #d9d9d9; }
+  #henri-os-concept .hos-tray { height: 29px; display: flex; align-items: center; gap: 12px; padding: 4px 8px; font-size: 11px; white-space: nowrap; box-shadow: inset 1px 1px var(--hos-mid), inset -1px -1px var(--hos-light); }
+  #henri-os-concept .hos-menu { position: absolute; left: 5px; bottom: 42px; width: 238px; z-index: 920; display: flex; padding: 3px; background: var(--hos-face); box-shadow: inset 1px 1px var(--hos-light), inset -1px -1px var(--hos-dark), 2px 2px #0006; }
+  #henri-os-concept .hos-menu-brand { writing-mode: vertical-rl; transform: rotate(180deg); background: var(--hos-blue); color: #eee; padding: 12px 6px; font: 500 21px 'Courier New', monospace; }
+  #henri-os-concept .hos-menu-items { flex: 1; }
+  #henri-os-concept .hos-menu button { width: 100%; background: transparent; border: 0; display: block; text-align: left; padding: 10px 13px; }
+  #henri-os-concept .hos-menu button:hover { background: var(--hos-blue); color: #fff; }
+  #henri-os-concept .hos-menu hr { border: 0; height: 2px; margin: 3px 5px; background: var(--hos-mid); box-shadow: 0 1px var(--hos-light); }
+  #henri-os-concept .hos-scan { position: absolute; inset: 0; z-index: 950; pointer-events: none; opacity: var(--hos-line-opacity); background: repeating-linear-gradient(to bottom, transparent 0 2px, #000 2px 3px); }
+  #henri-os-concept .hos-boot { position: absolute; inset: 0; z-index: 980; background: #070710; color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 18px; font-family: 'Courier New', monospace; }
+  #henri-os-concept .hos-boot-name { font: 500 58px/1.1 'Courier New', monospace; letter-spacing: -4px; }
+  #henri-os-concept .hos-boot small { color: #bbb; font-size: 12px; }
+  #henri-os-concept .hos-boot-track { width: 210px; height: 15px; background: #20202b; overflow: hidden; }
+  #henri-os-concept .hos-boot-bar { width: 55px; height: 15px; background: repeating-linear-gradient(90deg, #7272ee 0 7px, transparent 7px 9px); animation: hos-boot-pass 1.2s ease-in-out infinite; }
+  #henri-os-concept .hos-busy-label { position: absolute; z-index: 940; right: 12px; bottom: 51px; background: var(--hos-paper); color: #222; padding: 5px 9px; border: 1px solid #222; font-size: 11px; }
+  #henri-os-concept .hos-cursor { position: absolute; z-index: 999; pointer-events: none; width: 23px; height: 29px; display: none; }
+  #henri-os-concept .hos-cursor-arrow { width: 17px; height: 24px; background: #111; clip-path: polygon(0 0, 100% 70%, 59% 70%, 83% 100%, 59% 100%, 37% 72%, 0 100%); }
+  #henri-os-concept .hos-cursor-arrow::after { content: ''; display: block; width: 13px; height: 20px; margin: 2px; background: #fff; clip-path: polygon(0 0, 100% 70%, 55% 70%, 79% 100%, 59% 100%, 34% 69%, 0 100%); }
+  #henri-os-concept .hos-cursor-loader { display: none; position: absolute; top: 12px; left: 19px; width: 14px; height: 14px; border: 3px dotted #fff; border-top-color: #141481; border-radius: 50%; animation: hos-cursor-spin .75s linear infinite; filter: drop-shadow(1px 1px 0 #222); }
+  #henri-os-concept .hos-desktop.is-busy .hos-cursor-loader { display: block; }
+  #henri-os-concept .hos-setting { display: flex; gap: 10px; align-items: center; margin: 15px 0; }
+  #henri-os-concept .hos-setting input { accent-color: var(--hos-blue); width: 16px; height: 16px; }
+  #henri-os-concept .hos-avatar { font: 500 24px 'Courier New', monospace; background: #e9d7ed; color: #462d70; width: 55px; height: 55px; display: grid; place-items: center; border: 2px solid #462d70; float: right; margin: 0 0 10px 10px; }
+  #henri-os-concept .hos-window.hos-max { left: 0 !important; top: 0 !important; width: 100% !important; max-width: 100%; height: calc(100% - 42px); display: flex; flex-direction: column; }
+  #henri-os-concept .hos-max .hos-content { flex: 1; }
+  @keyframes hos-cursor-spin { to { transform: rotate(360deg); } }
+  @keyframes hos-boot-pass { 0% { transform: translateX(-55px); } 100% { transform: translateX(210px); } }
+  @media (pointer: fine) {
+    #henri-os-concept .hos-desktop.cursor-ready, #henri-os-concept .hos-desktop.cursor-ready button { cursor: none; }
+    #henri-os-concept .hos-desktop.cursor-ready .hos-title { cursor: move; }
+  }
+  @media (max-width: 580px) {
+    #henri-os-concept .hos-desktop { height: 700px; }
+    #henri-os-concept .hos-icons, #henri-os-concept [data-skin="studio"] .hos-icons { top: 15px; left: 8px; right: 8px; grid-template-columns: repeat(3, 1fr); gap: 7px 2px; }
+    #henri-os-concept .hos-shortcut { width: 100%; }
+    #henri-os-concept .hos-watermark { display: none; }
+    #henri-os-concept .hos-content { padding: 16px 14px; }
+    #henri-os-concept .hos-tape { margin: -16px -14px 16px; }
+    #henri-os-concept .hos-content h2 { font-size: 25px; }
+    #henri-os-concept .hos-tray { gap: 0; padding: 4px 5px; }
+    #henri-os-concept .hos-tray span { display: none; }
+    #henri-os-concept .hos-task { max-width: 125px; font-size: 11px; padding: 6px 4px; }
+    #henri-os-concept .hos-start { font-size: 12px; padding: 4px 7px; }
+    #henri-os-concept .hos-boot-name { font-size: 42px; }
+  }
+  @media (pointer: coarse) {
+    #henri-os-concept .hos-title { height: 44px; }
+    #henri-os-concept .hos-controls button { width: 44px; height: 40px; }
+    #henri-os-concept .hos-taskbar { height: 54px; }
+    #henri-os-concept .hos-start, #henri-os-concept .hos-task { height: 44px; }
+    #henri-os-concept .hos-menu { bottom: 54px; }
+    #henri-os-concept .hos-menu button, #henri-os-concept .hos-footer button { min-height: 44px; }
+    #henri-os-concept .hos-max { height: calc(100% - 54px) !important; }
+    #henri-os-concept .hos-setting { min-height: 44px; }
+    #henri-os-concept .hos-controls { gap: 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #henri-os-concept .hos-boot-bar, #henri-os-concept .hos-cursor-loader { animation: none; }
+  }
+</style>
+<script>
+(() => {
+  const root = document.getElementById('henri-os-concept');
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const appNames = { welcome: 'Bem-vindo.txt', projects: 'Meus projetos', about: 'Sobre mim.txt', contact: 'E-mail', resume: 'Currículo.txt', settings: 'Painel de controle', admin: 'Acesso do administrador' };
+  const desktops = [];
+  const saved = window.openai?.widgetState;
+  const initial = saved?.privateContent?.henriOS || {};
+  const appearance = { scanlines: initial.scanlines ?? true, delay: initial.delay ?? 1.8 };
+  function save() {
+    if (!window.openai?.setWidgetState) return;
+    const layouts = desktops.map(d => ({ skin: d.skin, windows: Array.from(d.windows.entries()).map(([app, win]) => ({ app, left: win.style.left, top: win.style.top, minimized: win.hidden, maximized: win.classList.contains('hos-max') })) }));
+    window.openai.setWidgetState({ modelContent: { concept: 'Henri OS', scanlines: appearance.scanlines, appOpeningSeconds: appearance.delay }, privateContent: { henriOS: { ...appearance, layouts } } }).catch(() => {});
+  }
+  function renderAppearance() {
+    desktops.forEach(d => {
+      d.el.style.setProperty('--hos-line-opacity', appearance.scanlines ? '.055' : '0');
+      d.el.querySelectorAll('[data-setting="scanlines"]').forEach(input => { input.checked = appearance.scanlines; });
+    });
+  }
+  function contents(app, skin) {
+    if (app === 'welcome') return `${skin === 'studio' ? '<div class="hos-tape"><span>PLAY ▷</span><span>PORTFOLIO / VOL. 01</span></div><div class="hos-avatar" aria-hidden="true">H.</div>' : ''}<div class="hos-eyebrow">Henri OS · Personal edition</div><h2>Oi, eu sou Henri.</h2><p>Este é meu espaço para criar, experimentar e compartilhar projetos.</p><p>Entre, abra uma pasta e fique à vontade.</p><div class="hos-footer"><button type="button" class="hos-bevel cursor-interaction" data-open="projects">Explorar projetos</button><button type="button" class="hos-bevel cursor-interaction" data-open="contact">Vamos conversar</button></div>`;
+    if (app === 'projects') return '<div class="hos-project-list"><div class="hos-project"><span class="hos-glyph folder" aria-hidden="true"></span><div><strong>01 · Aplicação web</strong><small>Interface · desenvolvimento · estudo de caso</small></div></div><div class="hos-project"><span class="hos-glyph folder" aria-hidden="true"></span><div><strong>02 · Experimento visual</strong><small>Interação · direção de arte · processo</small></div></div><div class="hos-project"><span class="hos-glyph folder" aria-hidden="true"></span><div><strong>03 · Projeto pessoal</strong><small>Ideia · construção · aprendizados</small></div></div></div><div class="hos-footer"><button type="button" class="hos-bevel cursor-interaction" data-open="about">Conhecer quem criou</button></div>';
+    if (app === 'about') return '<div class="hos-letter"><p>sobre-mim.txt</p><p>Um lugar para contar quem sou,<br>o que gosto de construir<br>e como penso sobre meus projetos.</p><p>Código, design e curiosidade.</p><p>— Henri</p></div>';
+    if (app === 'contact') return '<div class="hos-mail-row"><b>Para:</b><span>Henri</span></div><div class="hos-mail-row"><b>Assunto:</b><span>Vamos criar algo juntos?</span></div><div class="hos-letter" style="margin-top:18px">Aqui entram meu e-mail e os links para GitHub e LinkedIn.</div><div class="hos-footer"><button type="button" class="hos-bevel cursor-interaction" data-open="about">Sobre o Henri</button></div>';
+    if (app === 'resume') return '<div class="hos-letter"><p>CURRÍCULO / HENRI</p><p>Experiência<br>Formação<br>Habilidades<br>Links</p><p>Uma versão simples para ler,<br>com acesso ao PDF no site final.</p></div>';
+    if (app === 'settings') return `<p>Aparência do desktop</p><label class="hos-setting"><input type="checkbox" data-setting="scanlines" ${appearance.scanlines ? 'checked' : ''}> Efeito de tela antiga</label><p>O som de inicialização pode ser uma opção aqui.</p><div class="hos-footer"><button type="button" class="hos-bevel cursor-interaction" data-action="boot">Reiniciar Henri OS</button></div>`;
+    return '<div class="hos-eyebrow">Área administrativa</div><h2>Olá, administrador.</h2><p>Este será o acesso para gerenciar projetos e conteúdo.</p><p>A tela de autenticação pode seguir o visual clássico do sistema.</p>';
+  }
+  root.querySelectorAll('.hos-desktop').forEach(el => {
+    const skin = el.dataset.skin;
+    const data = { el, skin, windows: new Map(), pending: new Map(), z: 10, active: null, bootTimer: null };
+    desktops.push(data);
+    el.innerHTML = `<div class="hos-wallpaper"><div class="hos-watermark"><strong>${skin === 'classic' ? 'Henri OS' : 'creative files.'}</strong><span>${skin === 'classic' ? 'PERSONAL EDITION' : 'WORK IN PROGRESS / SINCE NOW'}</span></div></div><div class="hos-icons">${[['projects','folder','Projetos'],['about','note','Sobre mim'],['contact','mail','Contato'],['resume','disk','Currículo'],['settings','gear','Configurações'],['welcome','computer','Meu desktop']].map(([app, glyph, label]) => `<button type="button" class="hos-shortcut cursor-interaction" data-open="${app}" aria-label="Abrir ${label}"><span class="hos-glyph ${glyph}" aria-hidden="true"></span><span>${label}</span></button>`).join('')}</div><nav class="hos-taskbar" aria-label="Barra de tarefas"><button type="button" class="hos-start hos-bevel cursor-interaction" data-action="start" aria-expanded="false"><span class="hos-logo" aria-hidden="true"><i></i><i></i><i></i><i></i></span>Iniciar</button><div class="hos-tasks"></div><div class="hos-tray"><span aria-hidden="true">▣</span><time>14:98</time></div></nav><div class="hos-menu" hidden><div class="hos-menu-brand">Henri OS</div><div class="hos-menu-items"><button type="button" class="cursor-interaction" data-open="projects">Meus projetos</button><button type="button" class="cursor-interaction" data-open="about">Sobre mim</button><button type="button" class="cursor-interaction" data-open="contact">Contato</button><hr><button type="button" class="cursor-interaction" data-open="settings">Painel de controle</button><button type="button" class="cursor-interaction" data-open="admin">Administrador…</button><hr><button type="button" class="cursor-interaction" data-action="boot">Reiniciar…</button></div></div><div class="hos-scan" aria-hidden="true"></div><div class="hos-boot" hidden><div class="hos-logo" aria-hidden="true" style="width:42px;height:42px"><i></i><i></i><i></i><i></i></div><div class="hos-boot-name">Henri OS</div><small>Personal edition · Iniciando o sistema</small><div class="hos-boot-track" aria-hidden="true"><div class="hos-boot-bar"></div></div><button type="button" class="hos-bevel cursor-interaction" data-action="skip-boot">Pular inicialização</button></div><div class="hos-busy-label" role="status" aria-live="polite" hidden></div><div class="hos-cursor" aria-hidden="true"><div class="hos-cursor-arrow"></div><div class="hos-cursor-loader"></div></div>`;
+    const tasks = el.querySelector('.hos-tasks');
+    const menu = el.querySelector('.hos-menu');
+    const boot = el.querySelector('.hos-boot');
+    const busyLabel = el.querySelector('.hos-busy-label');
+    const cursor = el.querySelector('.hos-cursor');
+    function clock() { el.querySelector('time').textContent = new Intl.DateTimeFormat('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' }).format(new Date()); }
+    clock();
+    function menuClose() { menu.hidden = true; el.querySelector('[data-action="start"]').setAttribute('aria-expanded', 'false'); }
+    function redrawTasks() {
+      tasks.innerHTML = Array.from(data.windows.entries()).map(([app, win]) => `<button type="button" class="hos-task hos-bevel cursor-interaction" data-task="${app}" aria-pressed="${data.active === app && !win.hidden}" aria-label="${win.hidden ? 'Restaurar' : 'Alternar para'} ${appNames[app]}">${appNames[app]}</button>`).join('');
+    }
+    function focus(app) {
+      const win = data.windows.get(app);
+      if (!win) return;
+      data.windows.forEach(w => w.classList.remove('active'));
+      win.hidden = false; win.classList.add('active'); win.style.zIndex = ++data.z; data.active = app; redrawTasks();
+    }
+    function focusNext() {
+      const next = Array.from(data.windows.entries()).filter(([, win]) => !win.hidden).sort((a, b) => Number(b[1].style.zIndex) - Number(a[1].style.zIndex))[0];
+      data.active = null;
+      if (next) focus(next[0]); else redrawTasks();
+    }
+    function clampWindow(win) {
+      if (el.clientWidth === 0) return;
+      if (win.classList.contains('hos-max')) return;
+      win.style.left = Math.max(2, Math.min(parseFloat(win.style.left) || 2, Math.max(2, el.clientWidth - win.offsetWidth - 2))) + 'px';
+      const barHeight = el.querySelector('.hos-taskbar').offsetHeight;
+      const minimumTop = el.clientWidth < 581 ? 190 : 2;
+      win.style.top = Math.max(minimumTop, Math.min(parseFloat(win.style.top) || minimumTop, Math.max(minimumTop, el.clientHeight - barHeight - win.offsetHeight - 2))) + 'px';
+    }
+    function createWindow(app, restore) {
+      if (!appNames[app]) return;
+      if (data.windows.has(app)) { focus(app); return; }
+      const win = document.createElement('section');
+      win.className = 'hos-window'; win.setAttribute('role', 'region'); win.setAttribute('aria-label', appNames[app]); win.dataset.app = app;
+      const narrow = (el.clientWidth || 1024) < 581;
+      win.style.left = restore?.left || (narrow ? 8 : (skin === 'studio' ? 222 : 160) + data.windows.size * 30) + 'px';
+      win.style.top = restore?.top || (narrow ? 190 + data.windows.size * 23 : 60 + data.windows.size * 42) + 'px';
+      win.innerHTML = `<div class="hos-title"><span class="hos-title-symbol" aria-hidden="true">▤</span><span class="hos-title-text">${appNames[app]}</span><div class="hos-controls"><button type="button" class="hos-bevel cursor-interaction" data-win-action="min" aria-label="Minimizar ${appNames[app]}">_</button><button type="button" class="hos-bevel cursor-interaction" data-win-action="max" aria-label="Maximizar ${appNames[app]}">□</button><button type="button" class="hos-bevel cursor-interaction" data-win-action="close" aria-label="Fechar ${appNames[app]}">×</button></div></div><div class="hos-menubar" aria-hidden="true"><span>Arquivo</span><span>${app === 'projects' ? 'Exibir' : 'Editar'}</span><span>Ajuda</span></div><div class="hos-content">${contents(app, skin)}</div><div class="hos-status"><span>${app === 'projects' ? '3 pastas · conteúdo ilustrativo' : 'Henri OS · conteúdo ilustrativo'}</span><span>${app === 'welcome' ? 'Bem-vindo' : 'Pronto'}</span></div>`;
+      el.appendChild(win); data.windows.set(app, win); focus(app); clampWindow(win);
+      if (restore?.maximized) win.classList.add('hos-max');
+      if (restore?.minimized) { win.hidden = true; focusNext(); }
+      const title = win.querySelector('.hos-title');
+      title.addEventListener('dblclick', event => { if (!event.target.closest('button')) maximize(win); });
+      title.addEventListener('pointerdown', event => {
+        if (event.target.closest('button') || win.classList.contains('hos-max') || event.button !== 0) return;
+        event.preventDefault(); focus(app); title.setPointerCapture(event.pointerId);
+        const startX = event.clientX, startY = event.clientY, left = parseFloat(win.style.left), top = parseFloat(win.style.top);
+        function move(e) { win.style.left = left + e.clientX - startX + 'px'; win.style.top = top + e.clientY - startY + 'px'; clampWindow(win); }
+        function stop() { title.removeEventListener('pointermove', move); title.removeEventListener('pointerup', stop); title.removeEventListener('pointercancel', stop); save(); }
+        title.addEventListener('pointermove', move); title.addEventListener('pointerup', stop); title.addEventListener('pointercancel', stop);
+      });
+      win.addEventListener('pointerdown', () => { if (data.active !== app) focus(app); });
+      win.addEventListener('focusin', () => { if (data.active !== app) focus(app); });
+      redrawTasks();
+    }
+    function maximize(win) {
+      const maximized = win.classList.toggle('hos-max');
+      win.querySelector('[data-win-action="max"]').setAttribute('aria-label', `${maximized ? 'Restaurar' : 'Maximizar'} ${appNames[win.dataset.app]}`);
+      if (!maximized) clampWindow(win);
+      save();
+    }
+    function updateBusy() {
+      const busy = data.pending.size > 0; el.classList.toggle('is-busy', busy); busyLabel.hidden = !busy;
+      busyLabel.textContent = busy ? `Abrindo ${Array.from(data.pending.keys()).map(app => appNames[app]).join(', ')}…` : '';
+    }
+    function open(app) {
+      menuClose();
+      if (data.windows.has(app)) { focus(app); save(); return; }
+      if (data.pending.has(app)) return;
+      const timer = setTimeout(() => { data.pending.delete(app); createWindow(app); updateBusy(); save(); }, reducedMotion ? 0 : appearance.delay * 1000);
+      data.pending.set(app, timer); updateBusy();
+    }
+    function skipBoot() { clearTimeout(data.bootTimer); boot.hidden = true; }
+    function startBoot() {
+      menuClose();
+      data.pending.forEach(timer => clearTimeout(timer)); data.pending.clear(); updateBusy();
+      boot.hidden = false; clearTimeout(data.bootTimer);
+      data.bootTimer = setTimeout(skipBoot, reducedMotion ? 0 : 2400);
+    }
+    el.addEventListener('click', event => {
+      const target = event.target.closest('button');
+      if (!target) { if (!event.target.closest('.hos-menu')) menuClose(); return; }
+      if (target.dataset.open) { open(target.dataset.open); return; }
+      if (target.dataset.task) {
+        const app = target.dataset.task, win = data.windows.get(app);
+        if (data.active === app && !win.hidden) { win.hidden = true; focusNext(); } else focus(app);
+        save(); return;
+      }
+      const action = target.dataset.action;
+      if (action === 'start') { menu.hidden = !menu.hidden; target.setAttribute('aria-expanded', String(!menu.hidden)); }
+      if (action === 'boot') startBoot();
+      if (action === 'skip-boot') skipBoot();
+      const windowAction = target.dataset.winAction;
+      if (windowAction) {
+        const win = target.closest('.hos-window'), app = win.dataset.app;
+        if (windowAction === 'close') { data.windows.delete(app); win.remove(); focusNext(); save(); }
+        if (windowAction === 'min') { win.hidden = true; focusNext(); save(); }
+        if (windowAction === 'max') maximize(win);
+      }
+    });
+    el.addEventListener('change', event => { if (event.target.dataset.setting === 'scanlines') { appearance.scanlines = event.target.checked; renderAppearance(); save(); } });
+    el.addEventListener('keydown', event => { if (event.key === 'Escape') { menuClose(); if (!boot.hidden) skipBoot(); } });
+    el.addEventListener('pointermove', event => {
+      if (event.pointerType !== 'mouse') return;
+      const rect = el.getBoundingClientRect();
+      const useNativeCursor = Boolean(event.target.closest('.hos-title'));
+      el.classList.toggle('cursor-ready', !useNativeCursor); cursor.style.display = useNativeCursor ? 'none' : 'block';
+      cursor.style.left = event.clientX - rect.left + 'px'; cursor.style.top = event.clientY - rect.top + 'px';
+    });
+    el.addEventListener('pointerleave', () => { cursor.style.display = 'none'; el.classList.remove('cursor-ready'); });
+    new ResizeObserver(() => data.windows.forEach(clampWindow)).observe(el);
+    const restored = initial.layouts?.find(layout => layout.skin === skin)?.windows;
+    if (Array.isArray(restored)) restored.forEach(win => createWindow(win.app, win));
+    else {
+      if (skin === 'studio') createWindow('about', { left: '365px', top: '170px' });
+      createWindow('welcome');
+    }
+    data.restore = layout => {
+      if (!layout || !Array.isArray(layout.windows)) return;
+      data.windows.forEach(win => win.remove()); data.windows.clear(); data.active = null; redrawTasks();
+      layout.windows.forEach(win => createWindow(win.app, win));
+    };
+  });
+  renderAppearance();
+  window.addEventListener('openai:set_globals', event => {
+    const incoming = event.detail?.globals?.widgetState?.privateContent?.henriOS;
+    if (!incoming) return;
+    appearance.scanlines = incoming.scanlines ?? true; appearance.delay = incoming.delay ?? 1.8;
+    desktops.forEach(d => d.restore(incoming.layouts?.find(layout => layout.skin === d.skin))); renderAppearance();
+  });
+  if (globalThis.Tweak) {
+    const tweak = new Tweak({ container: root, onChange: () => { renderAppearance(); save(); } });
+    tweak.addToggle(appearance, 'scanlines', { label: 'Textura de tela antiga' });
+    tweak.addSlider(appearance, 'delay', { label: 'Tempo para abrir app', min: 0, max: 3, step: .1, unit: 's' });
+  }
+})();
+</script>
