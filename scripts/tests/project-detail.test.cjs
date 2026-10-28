@@ -78,6 +78,7 @@ test('não há dependência de sensores, GSAP ou observadores para os links orig
 test('atalho fica oculto com a aba em segundo plano e volta quando necessário', () => {
   const a = acesso();
   a.visivel(0);
+  a.documento.activeElement = a.barra.link;
   a.documento.hidden = true;
   a.documento.dispatchEvent(new Event('visibilitychange'));
   assert.equal(a.barra.hidden, true);

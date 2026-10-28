@@ -9,7 +9,7 @@ function iniciarAcessoRapidoProjeto(janela = window) {
   const atualizar = () => {
     if (encerrado) return;
     // Não retire da tela um link que ainda está sendo usado pelo teclado.
-    if (!documento.hidden && barra.contains(documento.activeElement)) return;
+    if (!documento.hidden && !barra.hidden && barra.contains(documento.activeElement)) return;
     barra.hidden = acessoVisivel || documento.hidden;
   };
   const depoisDoFoco = () => janela.queueMicrotask(atualizar);
