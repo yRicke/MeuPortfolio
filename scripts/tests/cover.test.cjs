@@ -222,9 +222,9 @@ test('iOS só solicita permissão no toque e calibra a primeira leitura válida'
   assert.equal(Math.abs(a.titulo.valores.rotationY), 0);
   a.orientar(67, 14);
   a.renderizar();
-  assert.equal(a.logo.valores.rotationY, 5);
-  assert.equal(a.titulo.valores.rotationX, -5);
-  assert.equal(a.projeto.valores.rotationY, 7);
+  assert.equal(a.logo.valores.rotationY, 10);
+  assert.equal(a.titulo.valores.rotationX, -10);
+  assert.equal(a.projeto.valores.rotationY, 14);
   assert.equal(a.descricao.valores.rotationY, 0);
 });
 
@@ -236,7 +236,7 @@ test('Android sem requestPermission também espera o visitante ativar o efeito',
   a.orientar(0, 0);
   a.orientar(0, 22);
   a.renderizar();
-  assert.equal(a.titulo.valores.rotationY, 5);
+  assert.equal(a.titulo.valores.rotationY, 10);
 });
 
 for (const [nome, permissao] of [
@@ -284,7 +284,7 @@ test('muitos eventos entre dois frames resultam em uma atualização com a últi
   assert.equal(a.quadros, 1);
   a.renderizar();
   assert.equal(a.atualizacoes - antes, 12);
-  assert.equal(a.projeto.valores.rotationX, -7);
+  assert.equal(a.projeto.valores.rotationX, -14);
 });
 
 for (const tipo of ['capa', 'aba']) {
@@ -333,7 +333,7 @@ test('girar a tela recalibra e troca os eixos da inclinação', async () => {
   assert.equal(Math.abs(a.logo.valores.rotationY), 0);
   a.orientar(67, -15);
   a.renderizar();
-  assert.equal(a.logo.valores.rotationY, 5);
+  assert.equal(a.logo.valores.rotationY, 10);
   assert.equal(Math.abs(a.logo.valores.rotationX), 0);
 });
 
@@ -348,7 +348,7 @@ test('o sensor só começa depois da conclusão do preloader', async () => {
   a.orientar(0, 0);
   a.orientar(22, 22);
   a.renderizar();
-  assert.equal(a.logo.valores.rotationY, 5);
+  assert.equal(a.logo.valores.rotationY, 10);
 });
 
 test('BFCache pausa e retoma os sensores sem novo pedido de permissão', async () => {

@@ -1,4 +1,4 @@
-/* Somente camadas de inclinação. O layout continua sendo o de a6abfb1 em main.css. */
+/* Camadas de inclinação e ajustes da composição mobile sobre a base de main.css. */
 .cover-copy {
   perspective: 1100px;
 }
@@ -49,6 +49,7 @@
   display: grid;
   justify-items: center;
   gap: 8px;
+  padding-block: 16px 24px;
   max-width: 300px;
   text-align: center;
 }
@@ -63,7 +64,7 @@
   justify-content: center;
   gap: 10px;
   min-height: 44px;
-  padding: 9px 16px;
+  padding: 14px 20px;
   border: 1px solid var(--border);
   border-radius: 24px;
   background: rgba(17, 13, 22, 0.65);
@@ -103,14 +104,33 @@
   }
 }
 
-/* Replica as medidas originais nos wrappers, sem redesenhar o mobile. */
 @media (max-width: 768px) {
+  .cover-copy {
+    text-align: center;
+  }
+
+  .cover-title span,
+  .cover-title span:last-child {
+    margin-inline: auto;
+    padding-inline: 0.04em;
+  }
+
+  .cover-summary {
+    justify-items: center;
+    margin-inline: auto;
+  }
+
+  .cover-summary p {
+    max-width: 36ch;
+    text-wrap: balance;
+  }
+
   .cover-logo-anchor {
     top: 45%;
-    left: -26vw;
+    left: 50%;
     width: min(140vw, 600px);
     height: min(140vw, 600px);
-    transform: translateY(-50%) rotate(-6deg);
+    transform: translate(-50%, -50%) rotate(-6deg);
   }
 
   .cover-art-position {

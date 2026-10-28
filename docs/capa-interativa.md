@@ -1,8 +1,9 @@
 # Base da cover, preloader e inclinação
 
 A `main` parte do commit `a6abfb1` — “feat (icons): adiciona e altera os icons”.
-O layout, as regras responsivas, os assets e as animações originais da página
-foram preservados. Os complementos são somente o preloader e a inclinação.
+O layout desktop, os assets e as animações originais da página foram
+preservados. A capa recebeu o preloader, a inclinação e os ajustes mobile
+de centralização e espaçamento descritos abaixo.
 
 ## Preloader
 
@@ -56,8 +57,10 @@ O efeito sempre começa por uma escolha do visitante. Quando existe
 Não há pedido de acesso ao magnetômetro ou à localização.
 
 A primeira leitura válida calibra a posição neutra de como o aparelho está
-sendo segurado. A logo e o nome inclinam até 5 graus; o card, até 7 graus,
-com deslocamentos pequenos e suavização pelo GSAP. Os textos de apoio e o
+sendo segurado. A logo e o nome inclinam até 10 graus; o card, até 14 graus.
+O movimento atinge a amplitude máxima com 18 graus de giro do aparelho,
+com deslocamentos de até 8 px na apresentação e 6 px no card, suavizados
+pelo GSAP. Os textos de apoio e o
 fundo continuam fixos. A leitura compensa a orientação da tela e recalibra
 ao girá-la, voltar à capa ou retornar à aba.
 
@@ -69,17 +72,19 @@ Sem suporte ou com preferência por movimento reduzido, o controle fica oculto.
 - `scripts/tests/cover.test.cjs`: orientação, permissões, pausa e mouse.
 - [API Device Orientation, W3C](https://www.w3.org/TR/orientation-event/).
 
-O controle ocupa uma linha após o card. As medidas e âncoras originais da
-apresentação e do projeto não foram redesenhadas.
+No mobile, o texto superior, as duas linhas do nome, a logo e a descrição
+ficam centralizados. As margens entre as linhas do nome são simétricas e
+a descrição usa quebra de linhas equilibrada. O controle ocupa uma linha
+após o card, com 16 px de espaço acima e 24 px abaixo, além de 14 px de
+padding vertical dentro do botão.
 
 ## Pendente: mobile
 
-- [ ] Pensar na centralização e no equilíbrio da composição no celular.
+- [x] Centralizar a apresentação e dar mais respiro ao botão no celular.
 - [x] Implementar inclinação por orientação, com ativação por toque e fallback estático.
 - [ ] Validar sensibilidade e permissão em iPhone/Safari e Android/Chrome reais.
 
-A centralização da composição continua pendente. A inclinação pode ser
-testada após publicar esta versão por HTTPS; acessar o servidor local pelo
+A inclinação pode ser testada no site publicado por HTTPS; acessar o servidor local pelo
 IP do computador em HTTP normalmente não disponibiliza os sensores.
 
 ## Verificação

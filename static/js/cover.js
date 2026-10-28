@@ -1,7 +1,9 @@
 const CONFIG_CAPA = Object.freeze({
   inclinacaoLogo: 7,
   inclinacaoProjeto: 9,
-  amplitudeSensor: 22,
+  inclinacaoLogoMobile: 10,
+  inclinacaoProjetoMobile: 14,
+  amplitudeSensor: 18,
   zonaMortaSensor: 0.4,
   limiteSensor: 5000,
 });
@@ -47,9 +49,9 @@ function iniciarInclinacaoMobile(capa) {
   const status = controle.querySelector('[data-cover-motion-status]');
   const eventos = new AbortController();
   const camadas = [
-    criarInclinacaoCapa(capa.querySelector('[data-cover-logo-tilt]'), 5, 4),
-    criarInclinacaoCapa(capa.querySelector('[data-cover-title]'), 5, 4),
-    criarInclinacaoCapa(capa.querySelector('[data-cover-project-tilt]'), 7, 3),
+    criarInclinacaoCapa(capa.querySelector('[data-cover-logo-tilt]'), CONFIG_CAPA.inclinacaoLogoMobile, 8),
+    criarInclinacaoCapa(capa.querySelector('[data-cover-title]'), CONFIG_CAPA.inclinacaoLogoMobile, 8),
+    criarInclinacaoCapa(capa.querySelector('[data-cover-project-tilt]'), CONFIG_CAPA.inclinacaoProjetoMobile, 6),
   ].filter(Boolean);
   let ativo = false;
   let descartado = false;
