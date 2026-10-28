@@ -44,17 +44,43 @@ movimenta somente a camada interna, preservando o posicionamento ao iniciar,
 ao sair com o mouse e ao mudar de breakpoint. O card também tem uma camada
 externa de medida original e uma figura interna para a inclinação.
 
-As interações respeitam movimento reduzido e funcionam apenas em desktop
-com ponteiro fino. O `main.css` original não recebeu alterações.
+As interações respeitam movimento reduzido. No desktop, continuam usando o
+mouse com ponteiro fino. O `main.css` original não recebeu alterações.
+
+## Inclinação por orientação no celular
+
+Em aparelhos com ponteiro de toque, contexto seguro (HTTPS) e suporte a
+`DeviceOrientationEvent`, a capa oferece o botão **Ativar inclinação**.
+O efeito sempre começa por uma escolha do visitante. Quando existe
+`requestPermission()`, a solicitação ocorre diretamente nesse toque.
+Não há pedido de acesso ao magnetômetro ou à localização.
+
+A primeira leitura válida calibra a posição neutra de como o aparelho está
+sendo segurado. A logo e o nome inclinam até 5 graus; o card, até 7 graus,
+com deslocamentos pequenos e suavização pelo GSAP. Os textos de apoio e o
+fundo continuam fixos. A leitura compensa a orientação da tela e recalibra
+ao girá-la, voltar à capa ou retornar à aba.
+
+O botão também permite desativar. A leitura é suspensa fora da capa, durante
+o preloader ou com a aba oculta. Negar a permissão, receber dados nulos ou
+ficar cinco segundos sem uma leitura válida mantém a composição estática.
+Sem suporte ou com preferência por movimento reduzido, o controle fica oculto.
+
+- `scripts/tests/cover.test.cjs`: orientação, permissões, pausa e mouse.
+- [API Device Orientation, W3C](https://www.w3.org/TR/orientation-event/).
+
+O controle ocupa uma linha após o card. As medidas e âncoras originais da
+apresentação e do projeto não foram redesenhadas.
 
 ## Pendente: mobile
 
 - [ ] Pensar na centralização e no equilíbrio da composição no celular.
-- [ ] Avaliar a inclinação por orientação do aparelho, com permissão explícita,
-  fallback estático e validação em iPhone e Android reais.
+- [x] Implementar inclinação por orientação, com ativação por toque e fallback estático.
+- [ ] Validar sensibilidade e permissão em iPhone/Safari e Android/Chrome reais.
 
-Esses ajustes ficam para uma próxima solicitação. Por enquanto, o mobile
-mantém o layout de `a6abfb1`.
+A centralização da composição continua pendente. A inclinação pode ser
+testada após publicar esta versão por HTTPS; acessar o servidor local pelo
+IP do computador em HTTP normalmente não disponibiliza os sensores.
 
 ## Verificação
 
@@ -66,5 +92,6 @@ PostgreSQL instalado para outra versão de Python.
 
 ```sh
 node --test scripts/tests/preloader.test.cjs
+node --test scripts/tests/cover.test.cjs
 python manage.py test --noinput
 ```

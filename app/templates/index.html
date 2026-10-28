@@ -6,7 +6,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/preloader.css' %}?v=3">
-<link rel="stylesheet" href="{% static 'css/cover.css' %}">
+<link rel="stylesheet" href="{% static 'css/cover.css' %}?v=2">
 <script src="{% static 'js/preloader.js' %}?v=3"></script>
 {% endblock %}
 
@@ -40,7 +40,7 @@
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{% static 'js/cover.js' %}" defer></script>
+<script src="{% static 'js/cover.js' %}?v=2" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -114,6 +114,17 @@
             </figure>
             </div>
 
+            <div class="cover-motion-control" data-cover-motion hidden>
+                <button type="button" class="cover-motion-toggle" aria-pressed="false">
+                    <svg width="16" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                         stroke-width="1.5" aria-hidden="true" focusable="false">
+                        <rect x="6" y="2" width="12" height="20" rx="2" transform="rotate(-12 12 12)"></rect>
+                        <path d="M10 18h3" transform="rotate(-12 12 12)"></path>
+                    </svg>
+                    <span data-cover-motion-label>Ativar inclinação</span>
+                </button>
+                <span class="cover-motion-status" data-cover-motion-status role="status" aria-live="polite"></span>
+            </div>
         </div>
 
         <a class="scroll-cue" href="#projetos" data-anchor-link data-hero-item>
