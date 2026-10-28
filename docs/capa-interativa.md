@@ -8,7 +8,8 @@ foram preservados. Os complementos são somente o preloader e a inclinação.
 
 Mantido como na versão aprovada: vídeo WebM automático, mínimo de dois segundos
 e saída deslizando para cima depois que a página e as fontes carregam. É
-dispensado em cache HTTP, retornos pelo histórico e revisitas da mesma sessão.
+dispensado em cache HTTP e retornos pelo histórico. Uma navegação nova ou um
+recarregamento fora do cache exibe o preloader, mesmo após outras visitas.
 
 - `static/js/preloader.js`: controle de carregamento, tempo e cache.
 - `static/css/preloader.css`: estilos exclusivos da camada de carregamento.
@@ -16,8 +17,10 @@ dispensado em cache HTTP, retornos pelo histórico e revisitas da mesma sessão.
 - `scripts/tests/preloader.test.cjs`: testes de tempo, cache e recuperação.
 
 As configurações ficam em `CONFIG_PRELOADER`, no início de `preloader.js`.
-Para repetir uma primeira visita durante o desenvolvimento, use uma sessão
-anônima nova ou remova `hv:preloader:v1` do sessionStorage.
+Para testar durante o desenvolvimento, use Ctrl + Shift + R para recarregar
+fora do cache. A antiga marca `hv:preloader:v1` do sessionStorage é ignorada:
+uma visita anterior não é prova de que a página atual veio do cache. Os links
+do script e do CSS incluem uma versão para atualizar os arquivos no navegador.
 
 ## Inclinação com mouse
 

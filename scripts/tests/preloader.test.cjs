@@ -128,7 +128,7 @@ test('página rápida aguarda dois segundos antes do slide e libera a interaçã
   assert.equal(a.principal.getAttribute('aria-busy'), null);
   assert.equal(a.video.pausas, 1);
   assert.equal(a.video.src, undefined);
-  assert.equal(a.valores.get('hv:preloader:v1'), '1');
+  assert.equal(a.valores.get('hv:preloader:v1'), undefined);
   a.avancar(20000);
   assert.equal(concluiu, 1);
 });
@@ -154,7 +154,6 @@ test('aguarda as fontes antes de abrir a página', async () => {
 });
 
 for (const [nome, opcoes] of [
-  ['visita na mesma sessão', { exibido: true }],
   ['cache HTTP informado pelo navegador', { navegacao: { deliveryType: 'cache' } }],
   ['cache HTTP sem transferência', { navegacao: { responseEnd: 100, transferSize: 0, decodedBodySize: 5000 } }],
   ['cache revalidado', { navegacao: { responseEnd: 100, transferSize: 300, encodedBodySize: 5000 } }],
@@ -170,6 +169,31 @@ for (const [nome, opcoes] of [
     assert.equal(a.principal.inert, false);
   });
 }
+
+for (const tipo of ['navigate', 'reload']) {
+  test(`marca de sessão antiga não oculta uma navegação nova: ${tipo}`, () => {
+    const a = ambiente({
+      exibido: true,
+      navegacao: {
+        type: tipo, responseEnd: 100, transferSize: 5300,
+        encodedBodySize: 5000, decodedBodySize: 8000,
+      },
+    });
+    assert.equal(a.documento.documentElement.classList.contains('is-preloading'), true);
+    assert.equal(a.video.reproducoes, 1);
+    a.carregar();
+    a.avancar(1999);
+    assert.equal(a.camada.classList.contains('is-leaving'), false);
+    a.avancar(1);
+    assert.equal(a.camada.classList.contains('is-leaving'), true);
+  });
+}
+
+test('recarregamento vindo do cache continua sem preloader mesmo com marca antiga', () => {
+  const a = ambiente({ exibido: true, navegacao: { type: 'reload', deliveryType: 'cache' } });
+  assert.equal(a.camada.removido, true);
+  assert.equal(a.video.reproducoes, 0);
+});
 
 test('métricas ainda zeradas não são confundidas com cache', () => {
   const a = ambiente({ navegacao: { transferSize: 0, decodedBodySize: 0 } });

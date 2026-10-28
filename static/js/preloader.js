@@ -3,7 +3,6 @@ const CONFIG_PRELOADER = Object.freeze({
   duracaoSaida: 750,
   limiteCarregamento: 15000,
   velocidadeVideo: 4,
-  chaveSessao: 'hv:preloader:v1',
 });
 
 function navegacaoEmCache(janela) {
@@ -17,22 +16,14 @@ function navegacaoEmCache(janela) {
 }
 
 function deveMostrarPreloader(janela) {
-  if (janela.matchMedia('(prefers-reduced-motion: reduce)').matches
-      || navegacaoEmCache(janela)) return false;
-  try {
-    return janela.sessionStorage.getItem(CONFIG_PRELOADER.chaveSessao) !== '1';
-  } catch {
-    return true;
-  }
+  return !janela.matchMedia('(prefers-reduced-motion: reduce)').matches
+    && !navegacaoEmCache(janela);
 }
 
 function iniciarPreloader(janela) {
   const documento = janela.document;
   const raiz = documento.documentElement;
   if (!deveMostrarPreloader(janela)) {
-    try {
-      janela.sessionStorage.setItem(CONFIG_PRELOADER.chaveSessao, '1');
-    } catch { /* O preloader também pode ser dispensado sem storage. */ }
     return { montar: () => documento.querySelector('[data-page-preloader]')?.remove() };
   }
 
@@ -46,12 +37,6 @@ function iniciarPreloader(janela) {
   let esperaMinima;
   let esperaTransicao;
   const superficies = [];
-
-  const lembrarVisita = () => {
-    try {
-      janela.sessionStorage.setItem(CONFIG_PRELOADER.chaveSessao, '1');
-    } catch { /* Navegação em cache ainda funciona sem acesso ao storage. */ }
-  };
 
   const finalizar = () => {
     if (fase === 'concluido') return;
@@ -71,7 +56,6 @@ function iniciarPreloader(janela) {
       if (ocupado === null) elemento.removeAttribute('aria-busy');
       else elemento.setAttribute('aria-busy', ocupado);
     });
-    lembrarVisita();
     janela.dispatchEvent(new janela.Event('preloader:complete'));
   };
 
