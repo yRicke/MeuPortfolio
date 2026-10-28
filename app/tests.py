@@ -916,7 +916,7 @@ class PaginasErroTest(TestCase):
 
 
 class ConfiguracaoDeployTest(SimpleTestCase):
-    def test_build_da_vercel_aplica_migrations(self):
+    def test_vercel_usa_runtime_django_para_build_migrations_e_wsgi(self):
         configuracao = json.loads(
             (settings.BASE_DIR / 'vercel.json').read_text(encoding='utf-8')
         )
@@ -925,3 +925,8 @@ class ConfiguracaoDeployTest(SimpleTestCase):
             configuracao['buildCommand'],
             'python manage.py migrate --noinput',
         )
+        self.assertEqual(configuracao['framework'], 'django')
+        entrada_wsgi = settings.WSGI_APPLICATION.rsplit('.', 1)[0].replace('.', '/') + '.py'
+        self.assertIn(entrada_wsgi, configuracao['functions'])
+        self.assertTrue((settings.BASE_DIR / entrada_wsgi).is_file())
+        self.assertNotIn('rewrites', configuracao)

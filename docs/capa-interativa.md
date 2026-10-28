@@ -58,6 +58,12 @@ mantém o layout de `a6abfb1`.
 
 ## Verificação
 
+O deploy declara o framework `django` e a entrada `setup/wsgi.py` em
+`vercel.json`. Assim, a Vercel executa as migrações no ambiente Python do
+projeto e atende as rotas pelo WSGI, sem reescrevê-las para `/api/index`.
+Isso evita executar as migrações com o Python do sistema e um driver
+PostgreSQL instalado para outra versão de Python.
+
 ```sh
 node --test scripts/tests/preloader.test.cjs
 python manage.py test --noinput

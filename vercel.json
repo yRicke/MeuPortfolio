@@ -1,16 +1,11 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "django",
   "buildCommand": "python manage.py migrate --noinput",
   "functions": {
-    "api/index.py": {
+    "setup/wsgi.py": {
       "maxDuration": 60,
       "excludeFiles": "{.env*,.agents/**,venv/**,db.sqlite3,media/**,staticfiles/**,app/tests.py,skills-lock.json}"
     }
-  },
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/api/index"
-    }
-  ]
+  }
 }
