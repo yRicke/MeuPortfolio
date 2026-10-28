@@ -114,53 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const detalhe = document.querySelector('[data-project-detail]');
   if (detalhe && !movimentoReduzido) {
-    const timeline = gsap.timeline({ defaults: { ease: 'power3.out' } });
-    timeline
-      .from('.project-detail-hero-chrome > *', {
-        y: -12,
-        autoAlpha: 0,
-        duration: 0.65,
-        stagger: 0.08,
-      })
-      .from('.project-detail-slide.is-active .project-detail-media', {
-        clipPath: 'inset(0 0 100% 0)',
-        duration: 1.2,
-      }, '-=0.4')
-      .from('.project-detail-slide.is-active .project-detail-media img', {
-        scale: 1.16,
-        duration: 1.5,
-      }, '<')
-      .from('.project-detail-title > *', {
-        y: 45,
-        autoAlpha: 0,
-        stagger: 0.12,
-      }, '-=0.7')
-      .from('.project-detail-carousel-controls', {
-        autoAlpha: 0,
-        duration: 0.6,
-      }, '-=0.45');
-
-    gsap.to('.project-detail-slide.is-active .project-detail-media img', {
-      yPercent: 7,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.project-detail-hero',
-        start: 'top top',
-        end: 'bottom top',
-        scrub: 0.9,
-      },
-    });
-
-    gsap.to('.project-detail-title', {
-      yPercent: 16,
-      autoAlpha: 0.18,
-      ease: 'none',
-      scrollTrigger: {
-        trigger: '.project-detail-hero',
-        start: 'top top',
-        end: 'bottom 35%',
-        scrub: 0.8,
-      },
+    gsap.from('.project-detail-gallery', {
+      y: 18,
+      autoAlpha: 0,
+      duration: 0.65,
+      ease: 'power3.out',
+      clearProps: 'transform,opacity,visibility',
     });
   }
 
@@ -174,6 +133,7 @@ function iniciarCarrosselProjeto({ movimentoReduzido, motorAnimacao }) {
   const anterior = carrossel?.querySelector('[data-project-carousel-previous]');
   const proximo = carrossel?.querySelector('[data-project-carousel-next]');
   const contador = carrossel?.querySelector('[data-project-carousel-current]');
+  const ampliar = carrossel?.querySelector('[data-project-image-link]');
 
   if (!carrossel || slides.length < 2 || !anterior || !proximo) {
     return;
@@ -193,6 +153,8 @@ function iniciarCarrosselProjeto({ movimentoReduzido, motorAnimacao }) {
     if (contador) {
       contador.textContent = String(indiceAtual + 1).padStart(2, '0');
     }
+    const imagem = slides[indiceAtual].querySelector('[data-project-image]');
+    if (ampliar && imagem) ampliar.setAttribute('href', imagem.getAttribute('src'));
   };
 
   const concluirTroca = (slideAtual, slideSeguinte) => {

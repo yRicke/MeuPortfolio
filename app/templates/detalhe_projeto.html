@@ -4,158 +4,149 @@
 {% block title %}{{ projeto.titulo }} — Henrique Vieira{% endblock %}
 {% block body_class %}project-detail-page{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/project-detail.css' %}?v=1">
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="{% static 'js/project-detail.js' %}?v=1" defer></script>
+{% endblock %}
+
 {% block content %}
-<article class="project-detail" data-project-detail>
-    <header
-        class="project-detail-hero"
-        data-project-carousel
-        aria-label="Imagens do projeto {{ projeto.titulo }}"
-    >
-        <div class="project-detail-hero-chrome" aria-hidden="true">
-            <span>HV / CASE STUDY</span>
-            <i></i>
-            <span>{% if projeto.data_desenvolvimento %}{{ projeto.data_desenvolvimento|date:"Y" }}{% else %}{{ projeto.data_criacao|date:"Y" }}{% endif %}</span>
-        </div>
-
-        <div class="project-detail-slider">
-            <div class="project-detail-slide is-active" data-project-slide aria-hidden="false">
-                <div class="project-detail-media" data-image-frame>
-                    {% if imagens_projeto %}
-                    <img
-                        src="{{ imagens_projeto.0.imagem.url }}"
-                        alt="Imagem principal do projeto {{ projeto.titulo }}"
-                        fetchpriority="high"
-                        data-project-image
-                    >
-                    {% endif %}
-                    <div class="image-fallback" aria-hidden="true">
-                        <span>HV</span>
-                        <small>CASE / STUDY</small>
-                    </div>
-                    <div class="project-detail-shade"></div>
-                    <span class="project-detail-frame-lines" aria-hidden="true"></span>
-                </div>
-                <div class="project-detail-title">
-                    <div class="project-detail-kicker">
-                        <p class="eyebrow">
-                            Projeto / {% if projeto.data_desenvolvimento %}{{ projeto.data_desenvolvimento|date:"Y" }}{% else %}{{ projeto.data_criacao|date:"Y" }}{% endif %}
-                        </p>
-                        {% if imagens_projeto %}
-                        <span>{{ imagens_projeto|length|stringformat:"02d" }} imagens selecionadas</span>
-                        {% endif %}
-                    </div>
-                    <h1>{{ projeto.titulo }}</h1>
-                    {% if imagens_projeto|length > 1 %}
-                    <p class="project-detail-interaction-hint">Arraste ou use as setas para explorar</p>
-                    {% endif %}
-                </div>
-            </div>
-
-            {% for item in imagens_projeto|slice:"1:" %}
-            <div class="project-detail-slide" data-project-slide aria-hidden="true">
-                <div class="project-detail-media" data-image-frame>
-                    <img
-                        src="{{ item.imagem.url }}"
-                        alt="Imagem {{ forloop.counter|add:'1' }} do projeto {{ projeto.titulo }}"
-                        loading="lazy"
-                        data-project-image
-                    >
-                    <div class="image-fallback" aria-hidden="true">
-                        <span>HV</span>
-                        <small>PROJECT / IMAGE</small>
-                    </div>
-                    <div class="project-detail-shade"></div>
-                    <span class="project-detail-frame-lines" aria-hidden="true"></span>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        {% if imagens_projeto|length > 1 %}
-        <div class="project-detail-carousel-controls" data-project-carousel-controls>
-            <button type="button" data-project-carousel-previous aria-label="Mostrar imagem anterior">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="M15 5 8 12l7 7"></path>
+<article class="project-detail{% if projeto.url %} project-detail--with-access{% endif %}" data-project-detail>
+    <header class="project-detail-hero">
+        <div class="project-detail-intro">
+            <a class="project-detail-back" href="{% url 'index' %}#projetos">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="1.5" aria-hidden="true" focusable="false">
+                    <path d="m12 5-7 7 7 7M5 12h14"></path>
                 </svg>
-            </button>
-            <p class="project-detail-carousel-status" aria-live="polite" aria-atomic="true">
-                <span data-project-carousel-current>01</span>
-                <i aria-hidden="true"></i>
-                <span>{{ imagens_projeto|length|stringformat:"02d" }}</span>
-            </p>
-            <button type="button" data-project-carousel-next aria-label="Mostrar próxima imagem">
-                <svg viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="m9 5 7 7-7 7"></path>
-                </svg>
-            </button>
-        </div>
-        {% endif %}
-    </header>
-
-    <section class="project-detail-overview" aria-labelledby="project-overview-title">
-        <header class="project-detail-overview-heading" data-reveal>
-            <p class="eyebrow">Sobre / projeto</p>
-            <h2 id="project-overview-title">Visão geral.</h2>
-        </header>
-
-        <div class="project-detail-body">
-            <div class="project-detail-copy" data-reveal>
-                <p>{{ projeto.descricao|linebreaksbr }}</p>
-                {% if projeto.data_desenvolvimento %}
-                <div class="project-development-date">
-                    <span>Desenvolvido em</span>
-                    <time datetime="{{ projeto.data_desenvolvimento|date:'Y-m' }}">
-                        {{ projeto.data_desenvolvimento|date:"F \d\e Y" }}
-                    </time>
-                </div>
-                {% endif %}
+                Todos os projetos
+            </a>
+            <div class="project-detail-title">
+                <p class="eyebrow">Projeto selecionado{% if projeto.data_desenvolvimento %} / {{ projeto.data_desenvolvimento|date:"Y" }}{% endif %}</p>
+                <h1>{{ projeto.titulo }}</h1>
+                <p class="project-detail-summary">{{ resumo_projeto|truncatechars:230 }}</p>
                 <div class="project-detail-actions">
                     {% if projeto.url %}
-                    <a class="button project-detail-primary-action" href="{{ projeto.url }}" target="_blank" rel="noopener">
-                        <span>Visitar projeto</span>
-                        <svg viewBox="0 0 24 24" aria-hidden="true">
-                            <path d="M7 17 17 7M8 7h9v9"></path>
-                        </svg>
-                    </a>
+                    {% include "partials/projeto_acesso.html" with principal=True %}
                     {% endif %}
-                    <a class="ghost-button" href="{% url 'index' %}#projetos">Voltar aos projetos</a>
-                    {% if user.is_authenticated %}
-                    <a class="ghost-button" href="{% url 'editar_projeto' projeto.id %}">Editar projeto</a>
-                    {% endif %}
+                    <a class="ghost-button" href="#sobre-projeto">Entender o projeto</a>
                 </div>
+                {% if projeto.url %}
+                <p class="project-detail-destination">{{ dominio_projeto }} <span>· abre em nova aba</span></p>
+                {% else %}
+                <p class="project-detail-destination">Este projeto não tem um link público informado.</p>
+                {% endif %}
             </div>
+        </div>
 
-            <aside class="project-detail-signature" data-reveal aria-hidden="true">
-                <img
-                    class="project-detail-signature-logo"
-                    src="{% static 'images/logo-hv.webp' %}"
-                    alt=""
-                >
-                <div>
-                    <small>Selected work</small>
-                    <small>Digital portfolio</small>
+        <section class="project-detail-gallery" data-project-carousel
+                 aria-label="Imagens do projeto {{ projeto.titulo }}"
+                 {% if imagens_projeto|length > 1 %}aria-roledescription="carrossel" tabindex="0"{% endif %}>
+            <div class="project-detail-hero-chrome">
+                <h2 class="eyebrow">Por dentro do projeto</h2>
+                {% if imagem_principal %}
+                <a href="{{ imagem_principal.url }}" data-project-image-link target="_blank" rel="noopener"
+                   aria-label="Ampliar imagem de {{ projeto.titulo }} (abre em nova aba)">
+                    Ampliar imagem {% include "partials/icone_seta_diagonal.html" %}
+                </a>
+                {% endif %}
+            </div>
+            <div class="project-detail-slider" id="project-gallery-track">
+                <div class="project-detail-slide is-active" data-project-slide aria-hidden="false">
+                    <div class="project-detail-media" data-image-frame>
+                        {% if imagem_principal %}
+                        <img src="{{ imagem_principal.url }}" alt="Prévia do projeto {{ projeto.titulo }}"
+                             fetchpriority="high" data-project-image>
+                        {% endif %}
+                        <div class="image-fallback" aria-hidden="true">
+                            <span>HV</span><small>PRÉVIA DO PROJETO</small>
+                        </div>
+                        <span class="project-detail-frame-lines" aria-hidden="true"></span>
+                    </div>
                 </div>
-                <i></i>
+                {% for item in imagens_projeto|slice:"1:" %}
+                <div class="project-detail-slide" data-project-slide aria-hidden="true">
+                    <div class="project-detail-media" data-image-frame>
+                        <img src="{{ item.imagem.url }}" alt="Imagem {{ forloop.counter|add:'1' }} do projeto {{ projeto.titulo }}"
+                             loading="lazy" data-project-image>
+                        <div class="image-fallback" aria-hidden="true">
+                            <span>HV</span><small>PRÉVIA DO PROJETO</small>
+                        </div>
+                        <span class="project-detail-frame-lines" aria-hidden="true"></span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% if imagens_projeto|length > 1 %}
+            <div class="project-detail-carousel-controls" data-project-carousel-controls>
+                <button type="button" data-project-carousel-previous aria-label="Mostrar imagem anterior" aria-controls="project-gallery-track">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 8 12l7 7"></path></svg>
+                </button>
+                <p class="project-detail-carousel-status" aria-live="polite" aria-atomic="true">
+                    <span data-project-carousel-current>01</span><span aria-hidden="true">/</span>
+                    <span>{{ imagens_projeto|length|stringformat:"02d" }}</span>
+                    <span class="project-detail-gallery-hint">Use as setas ou deslize</span>
+                </p>
+                <button type="button" data-project-carousel-next aria-label="Mostrar próxima imagem" aria-controls="project-gallery-track">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 5 7 7-7 7"></path></svg>
+                </button>
+            </div>
+            {% endif %}
+        </section>
+    </header>
+
+    <section class="project-detail-overview" id="sobre-projeto" aria-labelledby="project-overview-title">
+        <header class="project-detail-overview-heading">
+            <p class="eyebrow">Contexto / desenvolvimento</p>
+            <h2 id="project-overview-title">Sobre o projeto.</h2>
+        </header>
+        <div class="project-detail-body">
+            <div class="project-detail-copy">{{ projeto.descricao|linebreaks }}</div>
+            <aside class="project-detail-signature" aria-label="Acesso e informações do projeto">
+                <p class="eyebrow">Explore o projeto</p>
+                {% if projeto.url %}
+                {% include "partials/projeto_acesso.html" %}
+                <p class="project-detail-destination">{{ dominio_projeto }}</p>
+                {% else %}
+                <p class="project-detail-no-link">Veja a descrição e as imagens para conhecer o projeto. Não há um link público informado.</p>
+                {% endif %}
+                {% if projeto.data_desenvolvimento %}
+                <dl class="project-development-date">
+                    <dt>Desenvolvido em</dt>
+                    <dd><time datetime="{{ projeto.data_desenvolvimento|date:'Y-m' }}">{{ projeto.data_desenvolvimento|date:"F \d\e Y" }}</time></dd>
+                </dl>
+                {% endif %}
+                <div class="project-detail-author">
+                    <img class="project-detail-signature-logo" src="{% static 'images/logo-hv.webp' %}" alt="" aria-hidden="true">
+                    <span>Henrique Vieira<small>Desenvolvimento</small></span>
+                </div>
+                {% if user.is_authenticated %}
+                <a class="project-detail-edit" href="{% url 'editar_projeto' projeto.id %}">Editar projeto</a>
+                {% endif %}
             </aside>
         </div>
     </section>
 
     <footer class="project-detail-next">
         <div class="project-detail-next-heading">
-            <p class="eyebrow">Fim do projeto / Próximo passo</p>
-            <span>Tem uma ideia em mente?</span>
+            <p class="eyebrow">Continue explorando</p>
+            <span>Mais ideias transformadas em projetos</span>
         </div>
-        <a href="{% url 'index' %}#sobre">
-            <span>Trabalhe comigo</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M5 19 19 5M8 5h11v11"></path>
-            </svg>
+        <a href="{% url 'index' %}#projetos">
+            <span>Ver outros projetos</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 19 19 5M8 5h11v11"></path></svg>
         </a>
         <div class="project-detail-next-footer">
-            <span>Henrique Vieira</span>
-            <span>Design &amp; desenvolvimento</span>
-            <span>{% now "Y" %}</span>
+            <span>Henrique Vieira</span><span>Design &amp; desenvolvimento</span><span>{% now "Y" %}</span>
         </div>
     </footer>
+    {% if projeto.url %}
+    <nav class="project-detail-launchbar" data-project-launchbar hidden aria-label="Acesso rápido ao projeto">
+        <span class="project-detail-launchbar-title">{{ projeto.titulo }}</span>
+        {% include "partials/projeto_acesso.html" %}
+    </nav>
+    {% endif %}
 </article>
 {% endblock %}

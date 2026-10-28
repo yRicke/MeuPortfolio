@@ -1,5 +1,7 @@
 import json
+import re
 from datetime import datetime
+from urllib.parse import urlsplit
 
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
@@ -111,9 +113,23 @@ def detalhe_projeto(request, projeto_id):
         Projeto.objects.prefetch_related('imagens'),
         id=projeto_id,
     )
+    imagens = list(projeto.imagens.all())
+    descricao = ' '.join(projeto.descricao.split())
+    resumo = re.split(r'(?<=[.!?])\s+', descricao, maxsplit=1)[0]
+    try:
+        dominio = urlsplit(projeto.url).hostname or ''
+    except ValueError:
+        dominio = ''
     return render(request, 'detalhe_projeto.html', {
         'projeto': projeto,
-        'imagens_projeto': list(projeto.imagens.all()),
+        'imagens_projeto': imagens,
+        'imagem_principal': imagens[0].imagem if imagens else projeto.capa,
+        'resumo_projeto': resumo,
+        'dominio_projeto': dominio.removeprefix('www.'),
+        'rotulo_acesso_projeto': (
+            'Ver no GitHub' if dominio.lower() in ('github.com', 'www.github.com')
+            else 'Acessar projeto'
+        ),
     })
 
 

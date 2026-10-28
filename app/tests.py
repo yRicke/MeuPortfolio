@@ -279,10 +279,11 @@ class PortfolioViewTest(TestCase):
         self.assertContains(resposta, 'data-project-carousel-controls')
         self.assertContains(resposta, 'data-project-carousel-previous')
         self.assertContains(resposta, 'data-project-carousel-next')
-        self.assertContains(resposta, 'projetos/galeria/primeira.webp', count=1)
-        self.assertContains(resposta, 'projetos/galeria/segunda.webp', count=1)
+        self.assertContains(resposta, 'src="/media/projetos/galeria/primeira.webp"', count=1)
+        self.assertContains(resposta, 'src="/media/projetos/galeria/segunda.webp"', count=1)
+        self.assertContains(resposta, 'data-project-image-link')
         self.assertNotContains(resposta, self.projeto.capa.url)
-        self.assertNotContains(resposta, 'project-gallery')
+        self.assertNotContains(resposta, 'class="project-gallery"')
         self.assertNotContains(resposta, 'project-detail-slide-label')
         self.assertContains(resposta, 'project-detail-overview')
         self.assertContains(resposta, 'project-detail-signature')
@@ -291,14 +292,68 @@ class PortfolioViewTest(TestCase):
         self.assertContains(resposta, 'datetime="2025-08"')
         self.assertContains(resposta, 'Desenvolvido em')
 
-    def test_pagina_exclusiva_sem_imagens_nao_exibe_controles(self):
+    def test_pagina_exclusiva_sem_galeria_usa_capa_como_previa_sem_controles(self):
         resposta = self.client.get(
             reverse('detalhe_projeto', args=[self.projeto.id]),
         )
 
         self.assertContains(resposta, 'data-project-slide', count=1)
         self.assertNotContains(resposta, 'data-project-carousel-controls')
-        self.assertNotContains(resposta, self.projeto.capa.url)
+        self.assertContains(resposta, f'src="{self.projeto.capa.url}"', count=1)
+
+    def test_acesso_e_resumo_aparecem_antes_da_galeria(self):
+        self.projeto.descricao = 'Organiza os treinos de quem pratica musculação. Registra exercícios e repetições.'
+        self.projeto.save(update_fields=('descricao',))
+        resposta = self.client.get(reverse('detalhe_projeto', args=[self.projeto.id]))
+        html = resposta.content.decode()
+
+        self.assertEqual(resposta.context['resumo_projeto'], 'Organiza os treinos de quem pratica musculação.')
+        self.assertContains(resposta, self.projeto.descricao)
+        self.assertContains(resposta, 'data-project-primary-access', count=1)
+        self.assertContains(resposta, 'data-project-launchbar', count=1)
+        self.assertContains(resposta, 'example.com')
+        self.assertLess(html.index('<h1>'), html.index('data-project-carousel'))
+        self.assertLess(html.index('data-project-primary-access'), html.index('data-project-carousel'))
+        self.assertContains(resposta, 'href="#sobre-projeto"')
+        self.assertContains(resposta, 'id="sobre-projeto"')
+
+    def test_projeto_sem_url_explica_ausencia_e_nao_exibe_acessos_vazios(self):
+        self.projeto.url = ''
+        self.projeto.save(update_fields=('url',))
+        resposta = self.client.get(reverse('detalhe_projeto', args=[self.projeto.id]))
+
+        self.assertContains(resposta, 'não tem um link público informado')
+        self.assertNotContains(resposta, 'data-project-primary-access')
+        self.assertNotContains(resposta, 'data-project-launchbar')
+        self.assertNotContains(resposta, 'href=""')
+
+    def test_link_de_repositorio_identifica_github_como_destino(self):
+        self.projeto.url = 'https://github.com/henrique/projeto'
+        self.projeto.save(update_fields=('url',))
+        resposta = self.client.get(reverse('detalhe_projeto', args=[self.projeto.id]))
+
+        self.assertEqual(resposta.context['rotulo_acesso_projeto'], 'Ver no GitHub')
+        self.assertContains(resposta, 'Ver no GitHub')
+        self.assertContains(resposta, self.projeto.url)
+
+    def test_projeto_sem_qualquer_imagem_mantem_texto_e_acesso(self):
+        self.projeto.capa = ''
+        self.projeto.save(update_fields=('capa',))
+        resposta = self.client.get(reverse('detalhe_projeto', args=[self.projeto.id]))
+
+        self.assertContains(resposta, self.projeto.titulo)
+        self.assertContains(resposta, 'data-project-primary-access')
+        self.assertNotContains(resposta, 'data-project-image-link')
+        self.assertNotContains(resposta, 'data-project-carousel-controls')
+
+    def test_descricao_preserva_paragrafos_e_escapa_html(self):
+        self.projeto.descricao = 'Primeiro parágrafo.\n\nSegundo parágrafo com <script>alert(1)</script>.'
+        self.projeto.save(update_fields=('descricao',))
+        resposta = self.client.get(reverse('detalhe_projeto', args=[self.projeto.id]))
+
+        self.assertContains(resposta, '<p>Primeiro parágrafo.</p>', html=True)
+        self.assertContains(resposta, '&lt;script&gt;alert(1)&lt;/script&gt;')
+        self.assertNotContains(resposta, '<script>alert(1)</script>')
 
     def test_pagina_exclusiva_retorna_404_para_projeto_inexistente(self):
         resposta = self.client.get(reverse('detalhe_projeto', args=[999]))

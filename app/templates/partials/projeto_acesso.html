@@ -1,0 +1,6 @@
+<a class="button project-detail-primary-action" href="{{ projeto.url }}" target="_blank" rel="noopener"
+   aria-label="{{ rotulo_acesso_projeto }}: {{ projeto.titulo }} (abre em nova aba)"
+   {% if principal %}data-project-primary-access{% endif %}>
+    <span>{{ rotulo_acesso_projeto }}</span>
+    {% include "partials/icone_seta_diagonal.html" %}
+</a>
