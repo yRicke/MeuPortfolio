@@ -6,17 +6,28 @@ foram preservados. Os complementos são somente o preloader e a inclinação.
 
 ## Preloader
 
-Mantido como na versão aprovada: vídeo WebM automático, mínimo de dois segundos
-e saída deslizando para cima depois que a página e as fontes carregam. É
+Vídeo WebM automático, mínimo de dois segundos e saída deslizando para cima
+depois que a página, as fontes e a reprodução terminam. É
 dispensado em cache HTTP e retornos pelo histórico. Uma navegação nova ou um
 recarregamento fora do cache exibe o preloader, mesmo após outras visitas.
 
 - `static/js/preloader.js`: controle de carregamento, tempo e cache.
 - `static/css/preloader.css`: estilos exclusivos da camada de carregamento.
 - `static/videos/hv-preloader.webm`: mesmo vídeo já aprovado.
+- `scripts/preparar-video-capa.py`: converte o vídeo original sem sobrepor a logo estática.
 - `scripts/tests/preloader.test.cjs`: testes de tempo, cache e recuperação.
 
 As configurações ficam em `CONFIG_PRELOADER`, no início de `preloader.js`.
+O vídeo toca uma vez e conserva o último frame até a saída. Não há imagem
+substituta no HTML nem transição para PNG/WebP dentro do vídeo convertido.
+Se o vídeo falhar, a barra continua e a página é liberada normalmente.
+
+A barra e o contador ficam centralizados na parte inferior. A porcentagem
+representa o avanço das etapas (reprodução, tempo mínimo, página e fontes),
+não bytes transferidos. Ela não retrocede e só chega a 100% quando tudo está
+pronto. `pausaConclusao` mantém 100% visível por 180 ms antes do slide.
+O limite de espera continua em 15 segundos para evitar bloqueio por falhas.
+
 Para testar durante o desenvolvimento, use Ctrl + Shift + R para recarregar
 fora do cache. A antiga marca `hv:preloader:v1` do sessionStorage é ignorada:
 uma visita anterior não é prova de que a página atual veio do cache. Os links

@@ -32,17 +32,42 @@ function ambiente(opcoes = {}) {
   let proximoId = 0;
   const tarefas = new Map();
   const camada = new Elemento();
+  const indicador = new Elemento();
+  indicador.setAttribute('aria-valuenow', '0');
+  const barra = new Elemento();
+  const porcentagem = new Elemento();
+  porcentagem.textContent = '0%';
   const video = new Elemento();
   video.dataset = { src: '/static/videos/hv-preloader.webm' };
+  video.duration = opcoes.duracaoVideo ?? 8;
+  video.currentTime = 0;
   video.reproducoes = 0;
   video.pausas = 0;
+  let fimVideo;
+  let inicioVideo;
+  const terminarVideo = () => {
+    janela.clearTimeout(fimVideo);
+    video.currentTime = video.duration;
+    video.ended = true;
+    video.dispatchEvent(new Event('ended'));
+  };
   video.load = () => {};
-  video.pause = () => { video.pausas += 1; };
+  video.pause = () => { video.pausas += 1; janela.clearTimeout(fimVideo); };
   video.play = () => {
     video.reproducoes += 1;
-    return opcoes.autoplayBloqueado ? Promise.reject(new Error('Autoplay bloqueado')) : Promise.resolve();
+    if (opcoes.autoplayBloqueado) return Promise.reject(new Error('Autoplay bloqueado'));
+    inicioVideo = agora;
+    if (!opcoes.videoTravado && Number.isFinite(video.duration)) {
+      fimVideo = janela.setTimeout(terminarVideo, video.duration / video.playbackRate * 1000);
+    }
+    return Promise.resolve();
   };
-  camada.querySelector = () => video;
+  camada.querySelector = (seletor) => ({
+    '[data-preloader-video]': opcoes.semVideo ? null : video,
+    '[data-preloader-progress]': indicador,
+    '[data-preloader-progress-fill]': barra,
+    '[data-preloader-percentage]': porcentagem,
+  })[seletor];
   const principal = new Elemento();
   const nav = new Elemento();
   const documento = new EventTarget();
@@ -80,6 +105,12 @@ function ambiente(opcoes = {}) {
     return id;
   };
   janela.clearTimeout = (id) => tarefas.delete(id);
+  const moverRelogio = (tempo) => {
+    agora = tempo;
+    if (inicioVideo !== undefined && !opcoes.videoTravado && !video.ended && !video.pausas) {
+      video.currentTime = Math.min(video.duration, (agora - inicioVideo) / 1000 * video.playbackRate);
+    }
+  };
   const avancar = (tempo) => {
     const destino = agora + tempo;
     while (true) {
@@ -87,16 +118,17 @@ function ambiente(opcoes = {}) {
         .sort((a, b) => a[1].tempo - b[1].tempo)[0];
       if (!proxima) break;
       tarefas.delete(proxima[0]);
-      agora = proxima[1].tempo;
+      moverRelogio(proxima[1].tempo);
       proxima[1].acao();
     }
-    agora = destino;
+    moverRelogio(destino);
   };
   const controle = contexto.iniciarPreloader(janela);
   controle.montar();
   documento.dispatchEvent(new Event('DOMContentLoaded'));
   return {
-    janela, documento, camada, video, principal, nav, valores, avancar,
+    janela, documento, camada, video, indicador, barra, porcentagem, principal, nav, valores, avancar,
+    terminarVideo,
     carregar: () => janela.dispatchEvent(new Event('load')),
     fontesProntas: () => { documento.fonts.status = 'loaded'; resolverFontes(); },
     terminarSlide: () => {
@@ -118,6 +150,9 @@ test('página rápida aguarda dois segundos antes do slide e libera a interaçã
   a.avancar(1999);
   assert.equal(a.camada.classList.contains('is-leaving'), false);
   a.avancar(1);
+  assert.equal(a.porcentagem.textContent, '100%');
+  assert.equal(a.camada.classList.contains('is-leaving'), false);
+  a.avancar(180);
   assert.equal(a.camada.classList.contains('is-leaving'), true);
   assert.equal(a.camada.removido, false);
   a.terminarSlide();
@@ -138,7 +173,7 @@ test('página lenta continua coberta depois do mínimo e só sai quando carregar
   a.avancar(4500);
   assert.equal(a.camada.classList.contains('is-leaving'), false);
   a.carregar();
-  a.avancar(0);
+  a.avancar(180);
   assert.equal(a.camada.classList.contains('is-leaving'), true);
 });
 
@@ -149,7 +184,7 @@ test('aguarda as fontes antes de abrir a página', async () => {
   assert.equal(a.camada.classList.contains('is-leaving'), false);
   a.fontesProntas();
   await Promise.resolve();
-  a.avancar(0);
+  a.avancar(180);
   assert.equal(a.camada.classList.contains('is-leaving'), true);
 });
 
@@ -185,6 +220,7 @@ for (const tipo of ['navigate', 'reload']) {
     a.avancar(1999);
     assert.equal(a.camada.classList.contains('is-leaving'), false);
     a.avancar(1);
+    a.avancar(180);
     assert.equal(a.camada.classList.contains('is-leaving'), true);
   });
 }
@@ -229,20 +265,20 @@ test('restauração do BFCache remove a sobreposição sem reproduzir novamente'
   assert.equal(a.principal.inert, false);
 });
 
-test('falha no autoplay mostra a marca estática e respeita o mínimo', async () => {
+test('falha no autoplay mantém o progresso, sem trocar por imagem, e respeita o mínimo', async () => {
   const a = ambiente({ autoplayBloqueado: true });
   await Promise.resolve();
-  assert.equal(a.camada.classList.contains('has-fallback'), true);
+  assert.equal(a.camada.classList.contains('has-fallback'), false);
   a.carregar();
   a.avancar(1999);
   assert.equal(a.camada.classList.contains('is-leaving'), false);
-  a.avancar(851);
+  a.avancar(1031);
   assert.equal(a.camada.removido, true);
 });
 
 test('limite de carregamento e ausência de transitionend não deixam a página bloqueada', () => {
   const a = ambiente({ fontesCarregando: true });
-  a.avancar(15850);
+  a.avancar(16030);
   assert.equal(a.camada.removido, true);
   assert.equal(a.principal.inert, false);
 });
@@ -250,7 +286,108 @@ test('limite de carregamento e ausência de transitionend não deixam a página 
 test('funciona com sessionStorage bloqueado', () => {
   const a = ambiente({ storageBloqueado: true });
   a.carregar();
-  a.avancar(2850);
+  a.avancar(3030);
   assert.equal(a.camada.removido, true);
   assert.equal(a.principal.inert, false);
+});
+
+test('vídeo termina uma vez e conserva seu último frame durante a espera e o slide', () => {
+  const a = ambiente();
+  assert.equal(a.video.loop, false);
+  a.avancar(4500);
+  assert.equal(a.video.currentTime, a.video.duration);
+  assert.equal(a.video.reproducoes, 1);
+  assert.equal(a.video.pausas, 0);
+  assert.equal(a.video.src, a.video.dataset.src);
+  a.carregar();
+  a.avancar(180);
+  assert.equal(a.camada.classList.contains('is-leaving'), true);
+  assert.equal(a.video.currentTime, a.video.duration);
+  assert.equal(a.video.src, a.video.dataset.src);
+  a.terminarSlide();
+  assert.equal(a.video.src, undefined);
+});
+
+test('aguarda o vídeo terminar se a reprodução começar ou terminar mais tarde', () => {
+  const a = ambiente({ duracaoVideo: 16 });
+  a.carregar();
+  a.avancar(2180);
+  assert.equal(a.camada.classList.contains('is-leaving'), false);
+  assert.notEqual(a.porcentagem.textContent, '100%');
+  a.avancar(1820);
+  assert.equal(a.porcentagem.textContent, '100%');
+  assert.equal(a.camada.classList.contains('is-leaving'), false);
+  a.avancar(180);
+  assert.equal(a.camada.classList.contains('is-leaving'), true);
+});
+
+test('barra e contador avançam juntos sem chegar a 100 antes da página estar pronta', () => {
+  const a = ambiente();
+  let anterior = 0;
+  for (let i = 0; i < 8; i += 1) {
+    a.avancar(250);
+    const valor = Number(a.indicador.getAttribute('aria-valuenow'));
+    assert.ok(valor > anterior && valor < 100);
+    assert.equal(a.porcentagem.textContent, `${valor}%`);
+    assert.equal(a.barra.style.transform, `scaleX(${valor / 100})`);
+    anterior = valor;
+  }
+  a.avancar(1000);
+  assert.equal(Number(a.indicador.getAttribute('aria-valuenow')), anterior);
+  a.carregar();
+  a.avancar(0);
+  assert.equal(a.porcentagem.textContent, '100%');
+  assert.equal(a.barra.style.transform, 'scaleX(1)');
+});
+
+test('erro no arquivo de vídeo libera o fluxo sem inserir logo estática', () => {
+  const a = ambiente({ videoTravado: true });
+  a.carregar();
+  a.video.dispatchEvent(new Event('error'));
+  a.avancar(2180);
+  assert.equal(a.camada.classList.contains('has-fallback'), false);
+  assert.equal(a.porcentagem.textContent, '100%');
+  assert.equal(a.camada.classList.contains('is-leaving'), true);
+});
+
+test('vídeo travado tem limite de espera e não bloqueia a página', () => {
+  const a = ambiente({ videoTravado: true });
+  a.carregar();
+  a.avancar(14999);
+  assert.notEqual(a.porcentagem.textContent, '100%');
+  assert.equal(a.camada.classList.contains('is-leaving'), false);
+  a.avancar(1031);
+  assert.equal(a.camada.removido, true);
+  assert.equal(a.principal.inert, false);
+});
+
+test('progresso continua válido sem metadados de duração', () => {
+  const a = ambiente({ duracaoVideo: NaN });
+  a.carregar();
+  a.avancar(2200);
+  assert.ok(Number.isFinite(Number(a.indicador.getAttribute('aria-valuenow'))));
+  assert.notEqual(a.porcentagem.textContent, '100%');
+  a.video.dispatchEvent(new Event('error'));
+  a.avancar(180);
+  assert.equal(a.camada.classList.contains('is-leaving'), true);
+});
+
+test('sem elemento de vídeo a página ainda abre com progresso concluído', () => {
+  const a = ambiente({ semVideo: true });
+  a.carregar();
+  a.avancar(2180);
+  assert.equal(a.porcentagem.textContent, '100%');
+  assert.equal(a.camada.classList.contains('is-leaving'), true);
+});
+
+test('ao sair da página os temporizadores de progresso e de conclusão são cancelados', () => {
+  const a = ambiente();
+  a.carregar();
+  a.avancar(2000);
+  a.janela.dispatchEvent(new Event('pagehide'));
+  const progresso = a.porcentagem.textContent;
+  a.avancar(20000);
+  assert.equal(a.porcentagem.textContent, progresso);
+  assert.equal(a.camada.classList.contains('is-leaving'), false);
+  assert.equal(a.camada.removido, true);
 });

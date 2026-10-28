@@ -11,14 +11,9 @@ RAIZ = Path(__file__).resolve().parent.parent
 # Registro do enquadramento 1280x720 do vídeo fornecido na tela 1024x1024
 # da logo original. O ajuste é constante: não adiciona movimento de câmera.
 FILTROS = (
-    '[0:v]scale=1774:998:flags=lanczos,pad=1774:1024:0:16:black,'
+    'scale=1774:998:flags=lanczos,pad=1774:1024:0:16:black,'
     'crop=1024:1024:376:0,scale=768:768:flags=lanczos,'
-    'format=yuv420p,setpts=PTS-STARTPTS,fps=24[pintura];'
-    'color=c=black:s=768x768:r=24:d=8[preto];'
-    '[1:v]scale=768:768:flags=lanczos,format=rgba[marca];'
-    '[preto][marca]overlay=shortest=1:format=auto,format=yuv420p,'
-    'setpts=PTS-STARTPTS,fps=24[original];'
-    '[pintura][original]xfade=transition=fade:duration=0.333333:offset=7.5[video]'
+    'format=yuv420p,setpts=PTS-STARTPTS,fps=24'
 )
 
 
@@ -45,9 +40,7 @@ def main():
     subprocess.run([
         executavel, '-hide_banner', '-loglevel', 'error',
         '-i', str(opcoes.origem),
-        '-loop', '1', '-framerate', '24',
-        '-i', str(RAIZ / 'static/images/logo-hv-grafite.webp'),
-        '-filter_complex', FILTROS, '-map', '[video]', '-t', '8', '-an',
+        '-vf', FILTROS, '-map', '0:v:0', '-an',
         '-c:v', 'libvpx-vp9', '-crf', '30', '-b:v', '0', '-g', '48',
         '-deadline', 'good', '-cpu-used', '2', '-row-mt', '1',
         '-pix_fmt', 'yuv420p', '-y', str(opcoes.saida),

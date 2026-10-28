@@ -1,5 +1,6 @@
 const CONFIG_PRELOADER = Object.freeze({
   duracaoMinima: 2000,
+  pausaConclusao: 180,
   duracaoSaida: 750,
   limiteCarregamento: 15000,
   velocidadeVideo: 4,
@@ -32,17 +33,49 @@ function iniciarPreloader(janela) {
   let inicio = null;
   let camada;
   let video;
+  let videoConcluido = false;
+  let indicador;
+  let barra;
+  let porcentagem;
+  let progressoAtual = -1;
   let paginaPronta = documento.readyState === 'complete';
   let fontesProntas = !documento.fonts || documento.fonts.status === 'loaded';
   let esperaMinima;
+  let esperaProgresso;
+  let esperaConclusao;
   let esperaTransicao;
   const superficies = [];
+
+  const atualizarProgresso = (concluido = false) => {
+    const tempo = Math.min(1, (janela.performance.now() - inicio) / CONFIG_PRELOADER.duracaoMinima);
+    const reproducao = videoConcluido ? 1 : (
+      Number.isFinite(video?.duration) && video.duration > 0
+        ? Math.min(1, video.currentTime / video.duration) : 0
+    );
+    // Progresso das etapas, sem estimar bytes de uma página de tamanho desconhecido.
+    const estimativa = Math.floor(tempo * 20 + reproducao * 70
+      + (paginaPronta ? 5 : 0) + (fontesProntas ? 5 : 0));
+    const valor = concluido ? 100 : Math.max(progressoAtual, Math.min(99, estimativa));
+    if (valor === progressoAtual) return;
+    progressoAtual = valor;
+    indicador?.setAttribute('aria-valuenow', String(valor));
+    if (porcentagem) porcentagem.textContent = `${valor}%`;
+    if (barra) barra.style.transform = `scaleX(${valor / 100})`;
+  };
+
+  const acompanharProgresso = () => {
+    if (fase !== 'carregando') return;
+    atualizarProgresso();
+    esperaProgresso = janela.setTimeout(acompanharProgresso, 50);
+  };
 
   const finalizar = () => {
     if (fase === 'concluido') return;
     fase = 'concluido';
     janela.clearTimeout(limite);
     janela.clearTimeout(esperaMinima);
+    janela.clearTimeout(esperaProgresso);
+    janela.clearTimeout(esperaConclusao);
     janela.clearTimeout(esperaTransicao);
     if (video) {
       video.pause();
@@ -59,14 +92,9 @@ function iniciarPreloader(janela) {
     janela.dispatchEvent(new janela.Event('preloader:complete'));
   };
 
-  const sair = () => {
-    if (fase !== 'carregando') return;
-    if (!camada || janela.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      finalizar();
-      return;
-    }
+  const deslizar = () => {
+    if (fase !== 'pronto') return;
     fase = 'saindo';
-    janela.clearTimeout(limite);
     camada.addEventListener('transitionend', (evento) => {
       if (evento.target === camada && evento.propertyName === 'transform') finalizar();
     });
@@ -74,8 +102,22 @@ function iniciarPreloader(janela) {
     esperaTransicao = janela.setTimeout(finalizar, CONFIG_PRELOADER.duracaoSaida + 100);
   };
 
+  const sair = () => {
+    if (fase !== 'carregando') return;
+    if (!camada || janela.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      finalizar();
+      return;
+    }
+    fase = 'pronto';
+    janela.clearTimeout(limite);
+    janela.clearTimeout(esperaProgresso);
+    atualizarProgresso(true);
+    esperaConclusao = janela.setTimeout(deslizar, CONFIG_PRELOADER.pausaConclusao);
+  };
+
   const programarSaida = () => {
-    if (fase !== 'carregando' || inicio === null || !paginaPronta || !fontesProntas) return;
+    if (fase !== 'carregando' || inicio === null
+        || !paginaPronta || !fontesProntas || !videoConcluido) return;
     janela.clearTimeout(esperaMinima);
     const restante = CONFIG_PRELOADER.duracaoMinima - (janela.performance.now() - inicio);
     esperaMinima = janela.setTimeout(sair, Math.max(0, restante));
@@ -87,24 +129,33 @@ function iniciarPreloader(janela) {
     if (!camada) return;
     inicio = janela.performance.now();
     camada.style.setProperty('--preloader-exit-duration', `${CONFIG_PRELOADER.duracaoSaida}ms`);
+    indicador = camada.querySelector('[data-preloader-progress]');
+    barra = camada.querySelector('[data-preloader-progress-fill]');
+    porcentagem = camada.querySelector('[data-preloader-percentage]');
     video = camada.querySelector('[data-preloader-video]');
+    videoConcluido = !video;
     if (video) {
-      const mostrarMarca = () => {
-        if (fase !== 'concluido') camada.classList.add('has-fallback');
+      const concluirVideo = () => {
+        if (fase !== 'carregando') return;
+        videoConcluido = true;
+        programarSaida();
       };
-      video.addEventListener('error', mostrarMarca, { once: true });
+      // Sem loop nem troca de imagem: o navegador conserva o último frame no ended.
+      video.addEventListener('ended', concluirVideo, { once: true });
+      video.addEventListener('error', concluirVideo, { once: true });
       video.muted = true;
-      video.loop = true;
+      video.loop = false;
       video.defaultPlaybackRate = CONFIG_PRELOADER.velocidadeVideo;
       video.playbackRate = CONFIG_PRELOADER.velocidadeVideo;
       video.src = video.dataset.src;
       try {
         video.load();
-        video.play()?.catch(mostrarMarca);
+        video.play()?.catch(concluirVideo);
       } catch {
-        mostrarMarca();
+        concluirVideo();
       }
     }
+    acompanharProgresso();
     programarSaida();
   };
 
@@ -122,6 +173,7 @@ function iniciarPreloader(janela) {
     paginaPronta = true;
     fontesProntas = true;
     montar();
+    videoConcluido = true;
     if (inicio === null) finalizar();
     else programarSaida();
   }, CONFIG_PRELOADER.limiteCarregamento);

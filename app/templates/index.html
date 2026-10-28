@@ -5,29 +5,36 @@
 {% block body_class %}portfolio-page{% endblock %}
 
 {% block extra_head %}
-<link rel="stylesheet" href="{% static 'css/preloader.css' %}?v=2">
+<link rel="stylesheet" href="{% static 'css/preloader.css' %}?v=3">
 <link rel="stylesheet" href="{% static 'css/cover.css' %}">
-<script src="{% static 'js/preloader.js' %}?v=2"></script>
+<script src="{% static 'js/preloader.js' %}?v=3"></script>
 {% endblock %}
 
 {% block preloader %}
-<div class="page-preloader" data-page-preloader role="status" aria-live="polite">
+<div class="page-preloader" data-page-preloader>
     <video
         class="preloader-video"
         data-preloader-video
-        data-src="{% static 'videos/hv-preloader.webm' %}"
+        data-src="{% static 'videos/hv-preloader.webm' %}?v=3"
         preload="none"
         autoplay
         muted
-        loop
         playsinline
         disablepictureinpicture
         disableremoteplayback
         tabindex="-1"
         aria-hidden="true"
     ></video>
-    <img class="preloader-fallback" src="{% static 'images/logo-hv-grafite.webp' %}" alt="" aria-hidden="true">
-    <span class="preloader-label">Carregando portfólio</span>
+    <div class="preloader-progress" data-preloader-progress role="progressbar"
+         aria-label="Carregando portfólio" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="preloader-progress-caption" aria-hidden="true">
+            <span>Carregando portfólio</span>
+            <span class="preloader-percentage" data-preloader-percentage>0%</span>
+        </div>
+        <div class="preloader-progress-track" aria-hidden="true">
+            <span class="preloader-progress-fill" data-preloader-progress-fill></span>
+        </div>
+    </div>
 </div>
 <script>window.preloaderCapa?.montar();</script>
 {% endblock %}
