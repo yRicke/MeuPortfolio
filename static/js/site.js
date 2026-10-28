@@ -39,6 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
   gsap.registerPlugin(ScrollTrigger, ScrollToPlugin);
   document.documentElement.classList.add('has-gsap-scroll');
 
+  if (typeof iniciarCapa === 'function') {
+    iniciarCapa();
+  }
+
   let tweenDeNavegacao = null;
 
   const encontrarDestino = (url) => {
@@ -427,14 +431,6 @@ function iniciarPortfolio({ movimentoReduzido }) {
       },
     });
 
-    if (window.matchMedia('(pointer: fine)').matches && arte) {
-      const moverX = gsap.quickTo(arte, 'x', { duration: 0.8, ease: 'power3' });
-      const moverY = gsap.quickTo(arte, 'y', { duration: 0.8, ease: 'power3' });
-      capa.addEventListener('pointermove', (event) => {
-        moverX((event.clientX / window.innerWidth - 0.5) * 18);
-        moverY((event.clientY / window.innerHeight - 0.5) * 18);
-      });
-    }
   }
 
   animarCortina('.projects-curtain');

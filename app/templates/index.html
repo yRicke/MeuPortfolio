@@ -6,6 +6,7 @@
 
 {% block extra_head %}
 <link rel="stylesheet" href="{% static 'css/preloader.css' %}">
+<link rel="stylesheet" href="{% static 'css/cover.css' %}">
 <script src="{% static 'js/preloader.js' %}"></script>
 {% endblock %}
 
@@ -31,6 +32,10 @@
 <script>window.preloaderCapa?.montar();</script>
 {% endblock %}
 
+{% block extra_scripts %}
+<script src="{% static 'js/cover.js' %}" defer></script>
+{% endblock %}
+
 {% block content %}
 <div data-portfolio-page>
     <section class="portfolio-section cover-section" id="inicio" data-section="inicio">
@@ -39,16 +44,19 @@
         <div class="cover-orbit cover-orbit-two" data-cover-orbit></div>
 
         <div class="cover-content">
-            <div class="cover-copy">
-                <img
-                    class="cover-logo-watermark"
-                    src="{% static 'images/logo-hv-grafite.webp' %}"
-                    alt=""
-                    aria-hidden="true"
-                    data-hero-logo
-                >
+            <div class="cover-copy" data-cover-position>
+                <div class="cover-logo-anchor" aria-hidden="true">
+                    <div class="cover-logo-tilt" data-cover-logo-tilt>
+                        <img
+                            class="cover-logo-watermark"
+                            src="{% static 'images/logo-hv-grafite.webp' %}"
+                            alt=""
+                            data-hero-logo
+                        >
+                    </div>
+                </div>
                 <p class="eyebrow" data-hero-item>Portfólio independente / 2026</p>
-                <h1 class="cover-title" aria-label="Henrique Vieira, desenvolvedor full-stack">
+                <h1 class="cover-title" data-cover-title aria-label="Henrique Vieira, desenvolvedor full-stack">
                     <span data-hero-line>Henrique</span>
                     <span data-hero-line>Vieira</span>
                 </h1>
@@ -61,7 +69,8 @@
                 </div>
             </div>
 
-            <figure class="cover-art" data-cover-art>
+            <div class="cover-art-position" data-cover-art>
+            <figure class="cover-art" data-cover-project-tilt>
                 {% if projeto_destaque %}
                 <a
                     class="cover-art-link"
@@ -96,6 +105,7 @@
                 </a>
                 {% endif %}
             </figure>
+            </div>
 
         </div>
 
