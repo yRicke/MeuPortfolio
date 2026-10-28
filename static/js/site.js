@@ -80,7 +80,8 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   const transicao = document.querySelector('[data-page-transition]');
-  if (transicao && !movimentoReduzido) {
+  if (transicao && !movimentoReduzido
+      && !document.querySelector('[data-portfolio-page]')) {
     gsap.fromTo(
       transicao,
       { scaleY: 1, transformOrigin: 'top' },
@@ -160,6 +161,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   window.addEventListener('load', () => ScrollTrigger.refresh());
+  window.addEventListener('preloader:complete', () => ScrollTrigger.refresh(), { once: true });
 });
 
 function iniciarCarrosselProjeto({ movimentoReduzido, motorAnimacao }) {

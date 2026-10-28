@@ -1,0 +1,77 @@
+/* Preloader preservado da vers?o aprovada. */
+html {
+  scrollbar-gutter: stable;
+}
+
+.page-preloader {
+  position: fixed;
+  z-index: 120;
+  inset: 0;
+  display: none;
+  overflow: hidden;
+  place-items: center;
+  background: #000;
+  transform: translate3d(0, 0, 0);
+  transition: transform var(--preloader-exit-duration, 750ms) cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+.preloader-video,
+.preloader-fallback {
+  grid-area: 1 / 1;
+  width: min(80vw, 62svh, 656px);
+  height: min(80vw, 62svh, 656px);
+  max-width: none;
+  object-fit: contain;
+}
+
+.preloader-fallback {
+  display: none;
+}
+
+.page-preloader.has-fallback .preloader-video {
+  display: none;
+}
+
+.page-preloader.has-fallback .preloader-fallback {
+  display: block;
+}
+
+.preloader-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  border: 0;
+  white-space: nowrap;
+}
+
+.is-preloading,
+.is-preloading body {
+  overflow: hidden;
+}
+
+.is-preloading {
+  background: #000;
+}
+
+.is-preloading .page-transition {
+  display: none;
+}
+
+.is-preloading .page-preloader {
+  display: grid;
+}
+
+.page-preloader.is-leaving {
+  transform: translate3d(0, -100%, 0);
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-preloader {
+    transition: none;
+  }
+}

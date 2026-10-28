@@ -4,6 +4,33 @@
 {% block title %}Henrique Vieira — Desenvolvedor Full-Stack{% endblock %}
 {% block body_class %}portfolio-page{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/preloader.css' %}">
+<script src="{% static 'js/preloader.js' %}"></script>
+{% endblock %}
+
+{% block preloader %}
+<div class="page-preloader" data-page-preloader role="status" aria-live="polite">
+    <video
+        class="preloader-video"
+        data-preloader-video
+        data-src="{% static 'videos/hv-preloader.webm' %}"
+        preload="none"
+        autoplay
+        muted
+        loop
+        playsinline
+        disablepictureinpicture
+        disableremoteplayback
+        tabindex="-1"
+        aria-hidden="true"
+    ></video>
+    <img class="preloader-fallback" src="{% static 'images/logo-hv-grafite.webp' %}" alt="" aria-hidden="true">
+    <span class="preloader-label">Carregando portfólio</span>
+</div>
+<script>window.preloaderCapa?.montar();</script>
+{% endblock %}
+
 {% block content %}
 <div data-portfolio-page>
     <section class="portfolio-section cover-section" id="inicio" data-section="inicio">
