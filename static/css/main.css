@@ -71,6 +71,12 @@ button {
   color: #fff;
 }
 
+.icon-arrow-up-right {
+  display: inline-block;
+  flex-shrink: 0;
+  vertical-align: -0.125em;
+}
+
 .site-main {
   min-height: 100vh;
 }
